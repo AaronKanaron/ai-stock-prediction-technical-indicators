@@ -8,24 +8,54 @@ import seaborn as sns
 import os
 import joblib
 import datetime
+import json
 
-def load_data():
+def load_data(datasets=['OMXS30', 'SP500']):
     """
     Load training, validation, and test datasets.
+    
+    Parameters:
+    datasets (list): List of datasets to load. Options: ['OMXS30', 'SP500'] or ['OMXS30'] or ['SP500']
     
     Returns:
     tuple: (train_df, val_df, test_df)
     """
-    print("Loading datasets...")
+    print(f"Loading datasets: {datasets}...")
     
-    # Load the split datasets
-    train_df = pd.read_csv('training/OMXS30_train.csv')
-    val_df = pd.read_csv('training/OMXS30_val.csv')
-    test_df = pd.read_csv('test/OMXS30_test.csv')
+    train_dfs = []
+    val_dfs = []
+    test_dfs = []
     
-    print(f"Training set: {train_df.shape}")
-    print(f"Validation set: {val_df.shape}")
-    print(f"Test set: {test_df.shape}")
+    for dataset in datasets:
+        # Load the split datasets for each market
+        train_df = pd.read_csv(f'training/{dataset}_train.csv')
+        val_df = pd.read_csv(f'training/{dataset}_val.csv')
+        test_df = pd.read_csv(f'test/{dataset}_test.csv')
+        
+        train_dfs.append(train_df)
+        val_dfs.append(val_df)
+        test_dfs.append(test_df)
+        
+        print(f"{dataset} - Train: {train_df.shape}, Val: {val_df.shape}, Test: {test_df.shape}")
+    
+    # Combine datasets if multiple are provided
+    if len(datasets) > 1:
+        train_df = pd.concat(train_dfs, ignore_index=True)
+        val_df = pd.concat(val_dfs, ignore_index=True)
+        test_df = pd.concat(test_dfs, ignore_index=True)
+        print(f"\nCombined datasets:")
+    else:
+        train_df = train_dfs[0]
+        val_df = val_dfs[0]
+        test_df = test_dfs[0]
+    
+    print(f"Final Training set: {train_df.shape}")
+    print(f"Final Validation set: {val_df.shape}")
+    print(f"Final Test set: {test_df.shape}")
+    
+    # Print target distribution
+    train_target_dist = train_df['Target'].value_counts().sort_index()
+    print(f"Target distribution - Class 0: {train_target_dist[0]}, Class 1: {train_target_dist[1]} (ratio: {train_target_dist[0]/train_target_dist[1]:.2f}:1)")
     
     return train_df, val_df, test_df
 
@@ -102,14 +132,16 @@ def train_random_forest(X_train, y_train, class_weights=None, **rf_params):
     """
     # Default parameters for Random Forest
     default_params = {
-        'n_estimators': 100,
-        'max_depth': 8,
-        'min_samples_split': 30,
-        'min_samples_leaf': 15,
-        'max_features': 'sqrt',
+        'n_estimators': 200,
+        'max_depth': 5,
+        'min_samples_split': 100,
+        'min_samples_leaf': 50,
+        'max_features': 0.5,
+        'max_samples': 0.8,
         'bootstrap': True,
         'oob_score': True,
-        'class_weight': class_weights if class_weights is not None else 'balanced',
+        # 'class_weight': class_weights if class_weights is not None else 'balanced',
+        'class_weight': {0: 1.0, 1: 4.0},
         'random_state': 42,
         'n_jobs': -1
     }
@@ -196,6 +228,83 @@ def plot_feature_importance(model, feature_names, top_n=15):
     
     return feature_importance_df
 
+def log_training_results(model, metrics, selected_features, class_weights, model_filename, datasets_used=['OMXS30', 'SP500']):
+    """
+    Log training results to log.json file.
+    
+    Parameters:
+    model: Trained RandomForestClassifier
+    metrics (dict): Dictionary containing train/val/test metrics
+    selected_features (list): List of features used in training
+    class_weights (dict): Class weights used in training
+    model_filename (str): Name of the saved model file
+    datasets_used (list): List of datasets used for training
+    """
+    # Create log entry
+    log_entry = {
+        'timestamp': datetime.datetime.now().isoformat(),
+        'model_filename': model_filename,
+        'datasets_used': datasets_used,
+        'parameters': {
+            'n_estimators': model.n_estimators,
+            'max_depth': model.max_depth,
+            'min_samples_split': model.min_samples_split,
+            'min_samples_leaf': model.min_samples_leaf,
+            'max_features': model.max_features,
+            'max_samples': model.max_samples,
+            'bootstrap': model.bootstrap,
+            'class_weight': dict(model.class_weight) if hasattr(model.class_weight, 'items') else model.class_weight,
+            'random_state': model.random_state,
+            'oob_score': model.oob_score_
+        },
+        'features': {
+            'selected_features': selected_features,
+            'feature_count': len(selected_features)
+        },
+        'metrics': {
+            'training_set': {
+                'accuracy': round(metrics['train']['accuracy'], 4),
+                'precision': round(metrics['train']['precision'], 4),
+                'recall': round(metrics['train']['recall'], 4),
+                'f1_score': round(metrics['train']['f1_score'], 4)
+            },
+            'validation_set': {
+                'accuracy': round(metrics['val']['accuracy'], 4),
+                'precision': round(metrics['val']['precision'], 4),
+                'recall': round(metrics['val']['recall'], 4),
+                'f1_score': round(metrics['val']['f1_score'], 4)
+            },
+            'test_set': {
+                'accuracy': round(metrics['test']['accuracy'], 4),
+                'precision': round(metrics['test']['precision'], 4),
+                'recall': round(metrics['test']['recall'], 4),
+                'f1_score': round(metrics['test']['f1_score'], 4)
+            }
+        }
+    }
+    
+    # Load existing log or create new one
+    log_file = 'log.json'
+    try:
+        if os.path.exists(log_file):
+            with open(log_file, 'r') as f:
+                logs = json.load(f)
+        else:
+            logs = []
+    except (json.JSONDecodeError, FileNotFoundError):
+        logs = []
+    
+    # Add new entry
+    logs.append(log_entry)
+    
+    # Save updated log
+    with open(log_file, 'w') as f:
+        json.dump(logs, f, indent=2)
+    
+    print(f"\n✅ Training results logged to '{log_file}'")
+    print(f"📊 Log entry #{len(logs)} saved with timestamp: {log_entry['timestamp']}")
+    print(f"📈 Datasets used: {', '.join(datasets_used)}")
+
 def main():
     """
     Main function to train the optimal Random Forest model.
@@ -210,14 +319,24 @@ def main():
         'MACD_histogram',   # Important and unique
         'RSI_14',          # Important momentum indicator  
         'BB_width',        # Volatility measure
-        'Volume',          # Fundamental data
-        'High',            # Price data
-        'Rolling_Std_20'   # Volatility
+        'Volume',          # Keep volume - it helps despite missing data
+        'SMA_5',
+        'Rolling_Std_20',   # Volatility
+        
+        # Enhanced momentum features
+        # 'Return_5d_lag',    # 5-day momentum (lagged)
+        # 'Return_10d_lag',   # 10-day momentum (lagged)
+        
+        # # Enhanced volatility features
+        
+        # # Enhanced trend features
+        # 'SMA_ratio',        # Price relative to SMA
+        # 'Price_change_20d'  # 20-day price change
     ]
     
     try:
-        # 1. Load data
-        train_df, val_df, test_df = load_data()
+        # 1. Load data from both OMXS30 and SP500
+        train_df, val_df, test_df = load_data(datasets=['OMXS30', 'SP500'])
         
         # 2. Prepare features and targets with selected features
         print("\nPreparing data with selected features...")
@@ -247,7 +366,15 @@ def main():
         joblib.dump(rf_model, "models/" + model_filename)
         print(f"\n✅ Model saved as '{model_filename}'")
         
-        # 8. Summary
+        # 8. Log training results
+        print(f"\n=== LOGGING RESULTS ===")
+        log_training_results(rf_model, {
+            'train': train_metrics,
+            'val': val_metrics,
+            'test': test_metrics
+        }, selected_features, class_weights, model_filename, datasets_used=['OMXS30', 'SP500'])
+        
+        # 9. Summary
         print(f"\n=== FINAL MODEL SUMMARY ===")
         print(f"Features: {len(selected_features)}")
         print(f"Test Accuracy: {test_metrics['accuracy']:.4f}")

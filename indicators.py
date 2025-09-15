@@ -47,10 +47,19 @@ def calculate_technical_indicators(df):
     # Daily Return (Return_1d)
     data['Return_1d'] = data['Close'].pct_change()
     
+    # Enhanced Features
+    # Momentum features (lagged to avoid lookahead bias)
+    data['Return_5d_lag'] = data['Close'].pct_change(5).shift(1)
+    data['Return_10d_lag'] = data['Close'].pct_change(10).shift(1)
+        
+    # Trend features
+    data['SMA_ratio'] = data['Close'] / data['SMA_20']
+    data['Price_change_20d'] = data['Close'] / data['Close'].shift(20) - 1
+    
     # Target: 1 if 5-day future return > 2%, 0 otherwise
     data['Future_Close_5d'] = data['Close'].shift(-5)
     data['Return_5d'] = (data['Future_Close_5d'] - data['Close']) / data['Close']
-    threshold = 0.02  # 2% threshold
+    threshold = 0.015  # 2% threshold
     data['Target'] = (data['Return_5d'] > threshold).astype(int)
     
     # Remove the helper column
