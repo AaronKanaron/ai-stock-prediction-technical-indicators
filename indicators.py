@@ -47,12 +47,14 @@ def calculate_technical_indicators(df):
     # Daily Return (Return_1d)
     data['Return_1d'] = data['Close'].pct_change()
     
-    # Target: 1 if next day's return > 0, 0 otherwise
-    data['Next_Return'] = data['Return_1d'].shift(-1)
-    data['Target'] = (data['Next_Return'] > 0).astype(int)
+    # Target: 1 if 5-day future return > 2%, 0 otherwise
+    data['Future_Close_5d'] = data['Close'].shift(-5)
+    data['Return_5d'] = (data['Future_Close_5d'] - data['Close']) / data['Close']
+    threshold = 0.02  # 2% threshold
+    data['Target'] = (data['Return_5d'] > threshold).astype(int)
     
     # Remove the helper column
-    data = data.drop('Next_Return', axis=1)
+    data = data.drop(['Future_Close_5d', 'Return_5d'], axis=1)
     
     return data
 
@@ -95,8 +97,8 @@ def main():
     data_dir = "data"
     
     files_to_process = [
-        ("OMXS30_10year_data.csv", "OMXS30_with_indicators.csv"),
-        ("SP500_10year_data.csv", "SP500_with_indicators.csv")
+        ("OMXS30_10year_data.csv", "OMXS30.csv"),
+        ("SP500_10year_data.csv", "SP500.csv")
     ]
     
     # Ensure data directory exists
