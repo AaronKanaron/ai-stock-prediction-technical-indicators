@@ -88,7 +88,7 @@ def main():
     """
     
     # Define file paths
-    input_file = "data/SP500.csv"
+    input_file = "data/OMXS30.csv"
     output_dir_train = "training"
     output_dir_test = "test"
     
@@ -113,7 +113,7 @@ def main():
             train_data=train_data,
             val_data=val_data,
             test_data=test_data,
-            base_filename="SP500",
+            base_filename="OMXS30",
             output_dir_train=output_dir_train,
             output_dir_test=output_dir_test
         )

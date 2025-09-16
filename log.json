@@ -892,5 +892,1545 @@
         "f1_score": 0.4469
       }
     }
+  },
+  {
+    "timestamp": "2025-09-16T10:29:46.912526",
+    "model_filename": "random_forest_model_20250916_102946.pkl",
+    "datasets_used": [
+      "OMXS30",
+      "SP500"
+    ],
+    "parameters": {
+      "n_estimators": 200,
+      "max_depth": 5,
+      "min_samples_split": 100,
+      "min_samples_leaf": 50,
+      "max_features": 0.5,
+      "max_samples": 0.8,
+      "bootstrap": true,
+      "class_weight": {
+        "0": 1.0,
+        "1": 4.0
+      },
+      "random_state": 42,
+      "oob_score": 0.6205842391304348
+    },
+    "features": {
+      "selected_features": [
+        "Open",
+        "High",
+        "Low",
+        "Close",
+        "Volume",
+        "SMA_5",
+        "SMA_10",
+        "SMA_20",
+        "RSI_14",
+        "MACD",
+        "MACD_signal",
+        "MACD_histogram",
+        "BB_upper",
+        "BB_middle",
+        "BB_lower",
+        "BB_width",
+        "Rolling_Std_20",
+        "Return_1d",
+        "Return_5d_lag",
+        "Return_10d_lag",
+        "SMA_ratio",
+        "Price_change_20d"
+      ],
+      "feature_count": 22
+    },
+    "metrics": {
+      "training_set": {
+        "accuracy": 0.6559,
+        "precision": 0.3981,
+        "recall": 0.8022,
+        "f1_score": 0.5321
+      },
+      "validation_set": {
+        "accuracy": 0.4227,
+        "precision": 0.2972,
+        "recall": 0.8272,
+        "f1_score": 0.4373
+      },
+      "test_set": {
+        "accuracy": 0.5803,
+        "precision": 0.3444,
+        "recall": 0.686,
+        "f1_score": 0.4585
+      }
+    }
+  },
+  {
+    "timestamp": "2025-09-16T10:32:32.535523",
+    "model_filename": "random_forest_model_20250916_103232.pkl",
+    "datasets_used": [
+      "OMXS30",
+      "SP500"
+    ],
+    "parameters": {
+      "n_estimators": 200,
+      "max_depth": 5,
+      "min_samples_split": 100,
+      "min_samples_leaf": 50,
+      "max_features": 0.5,
+      "max_samples": 0.8,
+      "bootstrap": true,
+      "class_weight": {
+        "0": 1.0,
+        "1": 3.1002785515320332
+      },
+      "random_state": 42,
+      "oob_score": 0.673233695652174
+    },
+    "features": {
+      "selected_features": [
+        "Open",
+        "High",
+        "Low",
+        "Close",
+        "Volume",
+        "SMA_5",
+        "SMA_10",
+        "SMA_20",
+        "RSI_14",
+        "MACD",
+        "MACD_signal",
+        "MACD_histogram",
+        "BB_upper",
+        "BB_middle",
+        "BB_lower",
+        "BB_width",
+        "Rolling_Std_20",
+        "Return_1d",
+        "Return_5d_lag",
+        "Return_10d_lag",
+        "SMA_ratio",
+        "Price_change_20d"
+      ],
+      "feature_count": 22
+    },
+    "metrics": {
+      "training_set": {
+        "accuracy": 0.6997,
+        "precision": 0.4271,
+        "recall": 0.6769,
+        "f1_score": 0.5237
+      },
+      "validation_set": {
+        "accuracy": 0.4556,
+        "precision": 0.3054,
+        "recall": 0.7904,
+        "f1_score": 0.4406
+      },
+      "test_set": {
+        "accuracy": 0.6094,
+        "precision": 0.3554,
+        "recall": 0.624,
+        "f1_score": 0.4529
+      }
+    }
+  },
+  {
+    "timestamp": "2025-09-16T10:32:40.619289",
+    "model_filename": "random_forest_model_20250916_103240.pkl",
+    "datasets_used": [
+      "OMXS30",
+      "SP500"
+    ],
+    "parameters": {
+      "n_estimators": 200,
+      "max_depth": 5,
+      "min_samples_split": 100,
+      "min_samples_leaf": 50,
+      "max_features": 0.5,
+      "max_samples": 0.8,
+      "bootstrap": true,
+      "class_weight": {
+        "0": 1.0,
+        "1": 4.0
+      },
+      "random_state": 42,
+      "oob_score": 0.6205842391304348
+    },
+    "features": {
+      "selected_features": [
+        "Open",
+        "High",
+        "Low",
+        "Close",
+        "Volume",
+        "SMA_5",
+        "SMA_10",
+        "SMA_20",
+        "RSI_14",
+        "MACD",
+        "MACD_signal",
+        "MACD_histogram",
+        "BB_upper",
+        "BB_middle",
+        "BB_lower",
+        "BB_width",
+        "Rolling_Std_20",
+        "Return_1d",
+        "Return_5d_lag",
+        "Return_10d_lag",
+        "SMA_ratio",
+        "Price_change_20d"
+      ],
+      "feature_count": 22
+    },
+    "metrics": {
+      "training_set": {
+        "accuracy": 0.6559,
+        "precision": 0.3981,
+        "recall": 0.8022,
+        "f1_score": 0.5321
+      },
+      "validation_set": {
+        "accuracy": 0.4227,
+        "precision": 0.2972,
+        "recall": 0.8272,
+        "f1_score": 0.4373
+      },
+      "test_set": {
+        "accuracy": 0.5803,
+        "precision": 0.3444,
+        "recall": 0.686,
+        "f1_score": 0.4585
+      }
+    }
+  },
+  {
+    "timestamp": "2025-09-16T10:35:10.183368",
+    "model_filename": "random_forest_model_20250916_103510.pkl",
+    "datasets_used": [
+      "OMXS30",
+      "SP500"
+    ],
+    "parameters": {
+      "n_estimators": 200,
+      "max_depth": 5,
+      "min_samples_split": 100,
+      "min_samples_leaf": 50,
+      "max_features": 0.5,
+      "max_samples": 0.8,
+      "bootstrap": true,
+      "class_weight": {
+        "0": 1.0,
+        "1": 3.0
+      },
+      "random_state": 42,
+      "oob_score": 0.6800271739130435
+    },
+    "features": {
+      "selected_features": [
+        "Open",
+        "High",
+        "Low",
+        "Close",
+        "Volume",
+        "SMA_5",
+        "SMA_10",
+        "SMA_20",
+        "RSI_14",
+        "MACD",
+        "MACD_signal",
+        "MACD_histogram",
+        "BB_upper",
+        "BB_middle",
+        "BB_lower",
+        "BB_width",
+        "Rolling_Std_20",
+        "Return_1d",
+        "Return_5d_lag",
+        "Return_10d_lag",
+        "SMA_ratio",
+        "Price_change_20d"
+      ],
+      "feature_count": 22
+    },
+    "metrics": {
+      "training_set": {
+        "accuracy": 0.7055,
+        "precision": 0.4332,
+        "recall": 0.6727,
+        "f1_score": 0.527
+      },
+      "validation_set": {
+        "accuracy": 0.4616,
+        "precision": 0.308,
+        "recall": 0.7904,
+        "f1_score": 0.4433
+      },
+      "test_set": {
+        "accuracy": 0.6135,
+        "precision": 0.3567,
+        "recall": 0.6124,
+        "f1_score": 0.4508
+      }
+    }
+  },
+  {
+    "timestamp": "2025-09-16T10:35:17.367695",
+    "model_filename": "random_forest_model_20250916_103517.pkl",
+    "datasets_used": [
+      "OMXS30",
+      "SP500"
+    ],
+    "parameters": {
+      "n_estimators": 200,
+      "max_depth": 5,
+      "min_samples_split": 100,
+      "min_samples_leaf": 50,
+      "max_features": 0.5,
+      "max_samples": 0.8,
+      "bootstrap": true,
+      "class_weight": {
+        "0": 1.0,
+        "1": 2.0
+      },
+      "random_state": 42,
+      "oob_score": 0.7265625
+    },
+    "features": {
+      "selected_features": [
+        "Open",
+        "High",
+        "Low",
+        "Close",
+        "Volume",
+        "SMA_5",
+        "SMA_10",
+        "SMA_20",
+        "RSI_14",
+        "MACD",
+        "MACD_signal",
+        "MACD_histogram",
+        "BB_upper",
+        "BB_middle",
+        "BB_lower",
+        "BB_width",
+        "Rolling_Std_20",
+        "Return_1d",
+        "Return_5d_lag",
+        "Return_10d_lag",
+        "SMA_ratio",
+        "Price_change_20d"
+      ],
+      "feature_count": 22
+    },
+    "metrics": {
+      "training_set": {
+        "accuracy": 0.7568,
+        "precision": 0.5015,
+        "recall": 0.4708,
+        "f1_score": 0.4856
+      },
+      "validation_set": {
+        "accuracy": 0.5115,
+        "precision": 0.3165,
+        "recall": 0.6912,
+        "f1_score": 0.4342
+      },
+      "test_set": {
+        "accuracy": 0.6596,
+        "precision": 0.3884,
+        "recall": 0.5465,
+        "f1_score": 0.4541
+      }
+    }
+  },
+  {
+    "timestamp": "2025-09-16T10:35:23.834213",
+    "model_filename": "random_forest_model_20250916_103523.pkl",
+    "datasets_used": [
+      "OMXS30",
+      "SP500"
+    ],
+    "parameters": {
+      "n_estimators": 200,
+      "max_depth": 5,
+      "min_samples_split": 100,
+      "min_samples_leaf": 50,
+      "max_features": 0.5,
+      "max_samples": 0.8,
+      "bootstrap": true,
+      "class_weight": {
+        "0": 1.0,
+        "1": 4.0
+      },
+      "random_state": 42,
+      "oob_score": 0.6205842391304348
+    },
+    "features": {
+      "selected_features": [
+        "Open",
+        "High",
+        "Low",
+        "Close",
+        "Volume",
+        "SMA_5",
+        "SMA_10",
+        "SMA_20",
+        "RSI_14",
+        "MACD",
+        "MACD_signal",
+        "MACD_histogram",
+        "BB_upper",
+        "BB_middle",
+        "BB_lower",
+        "BB_width",
+        "Rolling_Std_20",
+        "Return_1d",
+        "Return_5d_lag",
+        "Return_10d_lag",
+        "SMA_ratio",
+        "Price_change_20d"
+      ],
+      "feature_count": 22
+    },
+    "metrics": {
+      "training_set": {
+        "accuracy": 0.6559,
+        "precision": 0.3981,
+        "recall": 0.8022,
+        "f1_score": 0.5321
+      },
+      "validation_set": {
+        "accuracy": 0.4227,
+        "precision": 0.2972,
+        "recall": 0.8272,
+        "f1_score": 0.4373
+      },
+      "test_set": {
+        "accuracy": 0.5803,
+        "precision": 0.3444,
+        "recall": 0.686,
+        "f1_score": 0.4585
+      }
+    }
+  },
+  {
+    "timestamp": "2025-09-16T10:41:50.833398",
+    "model_filename": "random_forest_model_20250916_104150.pkl",
+    "datasets_used": [
+      "OMXS30",
+      "SP500"
+    ],
+    "parameters": {
+      "n_estimators": 200,
+      "max_depth": 5,
+      "min_samples_split": 100,
+      "min_samples_leaf": 50,
+      "max_features": 0.5,
+      "max_samples": 0.8,
+      "bootstrap": true,
+      "class_weight": {
+        "0": 1.0,
+        "1": 4.0
+      },
+      "random_state": 42,
+      "oob_score": 0.5819170632222977
+    },
+    "features": {
+      "selected_features": [
+        "Open",
+        "High",
+        "Low",
+        "Close",
+        "Volume",
+        "SMA_5",
+        "SMA_10",
+        "SMA_20",
+        "RSI_14",
+        "MACD",
+        "MACD_signal",
+        "MACD_histogram",
+        "BB_upper",
+        "BB_middle",
+        "BB_lower",
+        "BB_width",
+        "Rolling_Std_20",
+        "Return_1d",
+        "Return_5d_lag",
+        "Return_10d_lag",
+        "SMA_ratio",
+        "Price_change_20d"
+      ],
+      "feature_count": 22
+    },
+    "metrics": {
+      "training_set": {
+        "accuracy": 0.6356,
+        "precision": 0.406,
+        "recall": 0.8468,
+        "f1_score": 0.5488
+      },
+      "validation_set": {
+        "accuracy": 0.4551,
+        "precision": 0.2849,
+        "recall": 0.784,
+        "f1_score": 0.4179
+      },
+      "test_set": {
+        "accuracy": 0.6145,
+        "precision": 0.3604,
+        "recall": 0.6154,
+        "f1_score": 0.4545
+      }
+    }
+  },
+  {
+    "timestamp": "2025-09-16T10:43:18.138507",
+    "model_filename": "random_forest_model_20250916_104318.pkl",
+    "datasets_used": [
+      "OMXS30",
+      "SP500"
+    ],
+    "parameters": {
+      "n_estimators": 200,
+      "max_depth": 5,
+      "min_samples_split": 100,
+      "min_samples_leaf": 50,
+      "max_features": 0.5,
+      "max_samples": 0.8,
+      "bootstrap": true,
+      "class_weight": {
+        "0": 1.0,
+        "1": 4.0
+      },
+      "random_state": 42,
+      "oob_score": 0.5819170632222977
+    },
+    "features": {
+      "selected_features": [
+        "Open",
+        "High",
+        "Low",
+        "Close",
+        "Volume",
+        "SMA_5",
+        "SMA_10",
+        "SMA_20",
+        "RSI_14",
+        "MACD",
+        "MACD_signal",
+        "MACD_histogram",
+        "BB_upper",
+        "BB_middle",
+        "BB_lower",
+        "BB_width",
+        "Rolling_Std_20",
+        "Return_1d",
+        "Return_5d_lag",
+        "Return_10d_lag",
+        "SMA_ratio",
+        "Price_change_20d"
+      ],
+      "feature_count": 22
+    },
+    "metrics": {
+      "training_set": {
+        "accuracy": 0.6356,
+        "precision": 0.406,
+        "recall": 0.8468,
+        "f1_score": 0.5488
+      },
+      "validation_set": {
+        "accuracy": 0.4551,
+        "precision": 0.2849,
+        "recall": 0.784,
+        "f1_score": 0.4179
+      },
+      "test_set": {
+        "accuracy": 0.6145,
+        "precision": 0.3604,
+        "recall": 0.6154,
+        "f1_score": 0.4545
+      }
+    }
+  },
+  {
+    "timestamp": "2025-09-16T10:44:24.098076",
+    "model_filename": "random_forest_model_20250916_104424.pkl",
+    "datasets_used": [
+      "OMXS30",
+      "SP500"
+    ],
+    "parameters": {
+      "n_estimators": 200,
+      "max_depth": 5,
+      "min_samples_split": 100,
+      "min_samples_leaf": 50,
+      "max_features": 0.5,
+      "max_samples": 0.8,
+      "bootstrap": true,
+      "class_weight": {
+        "0": 1.0,
+        "1": 4.0
+      },
+      "random_state": 42,
+      "oob_score": 0.5458839406207827
+    },
+    "features": {
+      "selected_features": [
+        "Open",
+        "High",
+        "Low",
+        "Close",
+        "Volume",
+        "SMA_5",
+        "SMA_10",
+        "SMA_20",
+        "RSI_14",
+        "MACD",
+        "MACD_signal",
+        "MACD_histogram",
+        "BB_upper",
+        "BB_middle",
+        "BB_lower",
+        "BB_width",
+        "Rolling_Std_20",
+        "Return_1d",
+        "Return_5d_lag",
+        "Return_10d_lag",
+        "SMA_ratio",
+        "Price_change_20d"
+      ],
+      "feature_count": 22
+    },
+    "metrics": {
+      "training_set": {
+        "accuracy": 0.5459,
+        "precision": 0.5459,
+        "recall": 1.0,
+        "f1_score": 0.7062
+      },
+      "validation_set": {
+        "accuracy": 0.4939,
+        "precision": 0.4939,
+        "recall": 1.0,
+        "f1_score": 0.6612
+      },
+      "test_set": {
+        "accuracy": 0.5425,
+        "precision": 0.5425,
+        "recall": 1.0,
+        "f1_score": 0.7034
+      }
+    }
+  },
+  {
+    "timestamp": "2025-09-16T10:46:52.580185",
+    "model_filename": "random_forest_model_20250916_104652.pkl",
+    "datasets_used": [
+      "OMXS30",
+      "SP500"
+    ],
+    "parameters": {
+      "n_estimators": 200,
+      "max_depth": 5,
+      "min_samples_split": 100,
+      "min_samples_leaf": 50,
+      "max_features": 0.5,
+      "max_samples": 0.8,
+      "bootstrap": true,
+      "class_weight": {
+        "0": 1.0,
+        "1": 0.8318912237330037
+      },
+      "random_state": 42,
+      "oob_score": 0.6383265856950068
+    },
+    "features": {
+      "selected_features": [
+        "Open",
+        "High",
+        "Low",
+        "Close",
+        "Volume",
+        "SMA_5",
+        "SMA_10",
+        "SMA_20",
+        "RSI_14",
+        "MACD",
+        "MACD_signal",
+        "MACD_histogram",
+        "BB_upper",
+        "BB_middle",
+        "BB_lower",
+        "BB_width",
+        "Rolling_Std_20",
+        "Return_1d",
+        "Return_5d_lag",
+        "Return_10d_lag",
+        "SMA_ratio",
+        "Price_change_20d"
+      ],
+      "feature_count": 22
+    },
+    "metrics": {
+      "training_set": {
+        "accuracy": 0.7281,
+        "precision": 0.7494,
+        "recall": 0.754,
+        "f1_score": 0.7517
+      },
+      "validation_set": {
+        "accuracy": 0.4737,
+        "precision": 0.4726,
+        "recall": 0.5656,
+        "f1_score": 0.5149
+      },
+      "test_set": {
+        "accuracy": 0.4858,
+        "precision": 0.5246,
+        "recall": 0.556,
+        "f1_score": 0.5399
+      }
+    }
+  },
+  {
+    "timestamp": "2025-09-16T10:48:26.423214",
+    "model_filename": "random_forest_model_20250916_104826.pkl",
+    "datasets_used": [
+      "OMXS30",
+      "SP500"
+    ],
+    "parameters": {
+      "n_estimators": 200,
+      "max_depth": 5,
+      "min_samples_split": 100,
+      "min_samples_leaf": 50,
+      "max_features": 0.5,
+      "max_samples": 0.8,
+      "bootstrap": true,
+      "class_weight": {
+        "0": 1.0,
+        "1": 1.4991568296795952
+      },
+      "random_state": 42,
+      "oob_score": 0.6376518218623481
+    },
+    "features": {
+      "selected_features": [
+        "Open",
+        "High",
+        "Low",
+        "Close",
+        "Volume",
+        "SMA_5",
+        "SMA_10",
+        "SMA_20",
+        "RSI_14",
+        "MACD",
+        "MACD_signal",
+        "MACD_histogram",
+        "BB_upper",
+        "BB_middle",
+        "BB_lower",
+        "BB_width",
+        "Rolling_Std_20",
+        "Return_1d",
+        "Return_5d_lag",
+        "Return_10d_lag",
+        "SMA_ratio",
+        "Price_change_20d"
+      ],
+      "feature_count": 22
+    },
+    "metrics": {
+      "training_set": {
+        "accuracy": 0.6856,
+        "precision": 0.5941,
+        "recall": 0.6762,
+        "f1_score": 0.6325
+      },
+      "validation_set": {
+        "accuracy": 0.5364,
+        "precision": 0.4113,
+        "recall": 0.5514,
+        "f1_score": 0.4711
+      },
+      "test_set": {
+        "accuracy": 0.583,
+        "precision": 0.5102,
+        "recall": 0.1208,
+        "f1_score": 0.1953
+      }
+    }
+  },
+  {
+    "timestamp": "2025-09-16T10:48:51.924793",
+    "model_filename": "random_forest_model_20250916_104851.pkl",
+    "datasets_used": [
+      "OMXS30",
+      "SP500"
+    ],
+    "parameters": {
+      "n_estimators": 200,
+      "max_depth": 5,
+      "min_samples_split": 100,
+      "min_samples_leaf": 50,
+      "max_features": 0.5,
+      "max_samples": 0.8,
+      "bootstrap": true,
+      "class_weight": {
+        "0": 1.0,
+        "1": 1.4991568296795952
+      },
+      "random_state": 42,
+      "oob_score": 0.6376518218623481
+    },
+    "features": {
+      "selected_features": [
+        "Open",
+        "High",
+        "Low",
+        "Close",
+        "Volume",
+        "SMA_5",
+        "SMA_10",
+        "SMA_20",
+        "RSI_14",
+        "MACD",
+        "MACD_signal",
+        "MACD_histogram",
+        "BB_upper",
+        "BB_middle",
+        "BB_lower",
+        "BB_width",
+        "Rolling_Std_20",
+        "Return_1d",
+        "Return_5d_lag",
+        "Return_10d_lag",
+        "SMA_ratio",
+        "Price_change_20d"
+      ],
+      "feature_count": 22
+    },
+    "metrics": {
+      "training_set": {
+        "accuracy": 0.6856,
+        "precision": 0.5941,
+        "recall": 0.6762,
+        "f1_score": 0.6325
+      },
+      "validation_set": {
+        "accuracy": 0.5364,
+        "precision": 0.4113,
+        "recall": 0.5514,
+        "f1_score": 0.4711
+      },
+      "test_set": {
+        "accuracy": 0.583,
+        "precision": 0.5102,
+        "recall": 0.1208,
+        "f1_score": 0.1953
+      }
+    }
+  },
+  {
+    "timestamp": "2025-09-16T10:49:12.427976",
+    "model_filename": "random_forest_model_20250916_104912.pkl",
+    "datasets_used": [
+      "OMXS30",
+      "SP500"
+    ],
+    "parameters": {
+      "n_estimators": 200,
+      "max_depth": 5,
+      "min_samples_split": 100,
+      "min_samples_leaf": 50,
+      "max_features": 0.5,
+      "max_samples": 0.8,
+      "bootstrap": true,
+      "class_weight": {
+        "0": 1.0,
+        "1": 1.8665377176015474
+      },
+      "random_state": 42,
+      "oob_score": 0.6322537112010796
+    },
+    "features": {
+      "selected_features": [
+        "Open",
+        "High",
+        "Low",
+        "Close",
+        "Volume",
+        "SMA_5",
+        "SMA_10",
+        "SMA_20",
+        "RSI_14",
+        "MACD",
+        "MACD_signal",
+        "MACD_histogram",
+        "BB_upper",
+        "BB_middle",
+        "BB_lower",
+        "BB_width",
+        "Rolling_Std_20",
+        "Return_1d",
+        "Return_5d_lag",
+        "Return_10d_lag",
+        "SMA_ratio",
+        "Price_change_20d"
+      ],
+      "feature_count": 22
+    },
+    "metrics": {
+      "training_set": {
+        "accuracy": 0.6883,
+        "precision": 0.5472,
+        "recall": 0.617,
+        "f1_score": 0.58
+      },
+      "validation_set": {
+        "accuracy": 0.5709,
+        "precision": 0.3793,
+        "recall": 0.3882,
+        "f1_score": 0.3837
+      },
+      "test_set": {
+        "accuracy": 0.6316,
+        "precision": 0.4559,
+        "recall": 0.1761,
+        "f1_score": 0.2541
+      }
+    }
+  },
+  {
+    "timestamp": "2025-09-16T10:49:42.688566",
+    "model_filename": "random_forest_model_20250916_104942.pkl",
+    "datasets_used": [
+      "OMXS30",
+      "SP500"
+    ],
+    "parameters": {
+      "n_estimators": 200,
+      "max_depth": 5,
+      "min_samples_split": 100,
+      "min_samples_leaf": 50,
+      "max_features": 0.5,
+      "max_samples": 0.8,
+      "bootstrap": true,
+      "class_weight": {
+        "0": 1.0,
+        "1": 2.8493506493506495
+      },
+      "random_state": 42,
+      "oob_score": 0.6828609986504723
+    },
+    "features": {
+      "selected_features": [
+        "Open",
+        "High",
+        "Low",
+        "Close",
+        "Volume",
+        "SMA_5",
+        "SMA_10",
+        "SMA_20",
+        "RSI_14",
+        "MACD",
+        "MACD_signal",
+        "MACD_histogram",
+        "BB_upper",
+        "BB_middle",
+        "BB_lower",
+        "BB_width",
+        "Rolling_Std_20",
+        "Return_1d",
+        "Return_5d_lag",
+        "Return_10d_lag",
+        "SMA_ratio",
+        "Price_change_20d"
+      ],
+      "feature_count": 22
+    },
+    "metrics": {
+      "training_set": {
+        "accuracy": 0.7213,
+        "precision": 0.4739,
+        "recall": 0.6597,
+        "f1_score": 0.5516
+      },
+      "validation_set": {
+        "accuracy": 0.5951,
+        "precision": 0.3221,
+        "recall": 0.5317,
+        "f1_score": 0.4012
+      },
+      "test_set": {
+        "accuracy": 0.7389,
+        "precision": 0.5,
+        "recall": 0.1395,
+        "f1_score": 0.2182
+      }
+    }
+  },
+  {
+    "timestamp": "2025-09-16T10:50:43.178415",
+    "model_filename": "random_forest_model_20250916_105043.pkl",
+    "datasets_used": [
+      "OMXS30",
+      "SP500"
+    ],
+    "parameters": {
+      "n_estimators": 200,
+      "max_depth": 5,
+      "min_samples_split": 100,
+      "min_samples_leaf": 50,
+      "max_features": 0.5,
+      "max_samples": 0.8,
+      "bootstrap": true,
+      "class_weight": {
+        "0": 1.0,
+        "1": 2.8493506493506495
+      },
+      "random_state": 42,
+      "oob_score": 0.6828609986504723
+    },
+    "features": {
+      "selected_features": [
+        "Open",
+        "High",
+        "Low",
+        "Close",
+        "Volume",
+        "SMA_5",
+        "SMA_10",
+        "SMA_20",
+        "RSI_14",
+        "MACD",
+        "MACD_signal",
+        "MACD_histogram",
+        "BB_upper",
+        "BB_middle",
+        "BB_lower",
+        "BB_width",
+        "Rolling_Std_20",
+        "Return_1d",
+        "Return_5d_lag",
+        "Return_10d_lag",
+        "SMA_ratio",
+        "Price_change_20d"
+      ],
+      "feature_count": 22
+    },
+    "metrics": {
+      "training_set": {
+        "accuracy": 0.7213,
+        "precision": 0.4739,
+        "recall": 0.6597,
+        "f1_score": 0.5516
+      },
+      "validation_set": {
+        "accuracy": 0.5951,
+        "precision": 0.3221,
+        "recall": 0.5317,
+        "f1_score": 0.4012
+      },
+      "test_set": {
+        "accuracy": 0.7389,
+        "precision": 0.5,
+        "recall": 0.1395,
+        "f1_score": 0.2182
+      }
+    }
+  },
+  {
+    "timestamp": "2025-09-16T10:50:51.329683",
+    "model_filename": "random_forest_model_20250916_105051.pkl",
+    "datasets_used": [
+      "OMXS30",
+      "SP500"
+    ],
+    "parameters": {
+      "n_estimators": 200,
+      "max_depth": 5,
+      "min_samples_split": 100,
+      "min_samples_leaf": 50,
+      "max_features": 0.5,
+      "max_samples": 0.8,
+      "bootstrap": true,
+      "class_weight": {
+        "0": 1.0,
+        "1": 4.592452830188679
+      },
+      "random_state": 42,
+      "oob_score": 0.7145748987854251
+    },
+    "features": {
+      "selected_features": [
+        "Open",
+        "High",
+        "Low",
+        "Close",
+        "Volume",
+        "SMA_5",
+        "SMA_10",
+        "SMA_20",
+        "RSI_14",
+        "MACD",
+        "MACD_signal",
+        "MACD_histogram",
+        "BB_upper",
+        "BB_middle",
+        "BB_lower",
+        "BB_width",
+        "Rolling_Std_20",
+        "Return_1d",
+        "Return_5d_lag",
+        "Return_10d_lag",
+        "SMA_ratio",
+        "Price_change_20d"
+      ],
+      "feature_count": 22
+    },
+    "metrics": {
+      "training_set": {
+        "accuracy": 0.7767,
+        "precision": 0.427,
+        "recall": 0.7283,
+        "f1_score": 0.5384
+      },
+      "validation_set": {
+        "accuracy": 0.581,
+        "precision": 0.2565,
+        "recall": 0.6211,
+        "f1_score": 0.3631
+      },
+      "test_set": {
+        "accuracy": 0.6943,
+        "precision": 0.2971,
+        "recall": 0.4316,
+        "f1_score": 0.3519
+      }
+    }
+  },
+  {
+    "timestamp": "2025-09-16T10:51:09.072760",
+    "model_filename": "random_forest_model_20250916_105109.pkl",
+    "datasets_used": [
+      "OMXS30",
+      "SP500"
+    ],
+    "parameters": {
+      "n_estimators": 200,
+      "max_depth": 5,
+      "min_samples_split": 100,
+      "min_samples_leaf": 50,
+      "max_features": 0.5,
+      "max_samples": 0.8,
+      "bootstrap": true,
+      "class_weight": {
+        "0": 1.0,
+        "1": 4.0
+      },
+      "random_state": 42,
+      "oob_score": 0.7496626180836707
+    },
+    "features": {
+      "selected_features": [
+        "Open",
+        "High",
+        "Low",
+        "Close",
+        "Volume",
+        "SMA_5",
+        "SMA_10",
+        "SMA_20",
+        "RSI_14",
+        "MACD",
+        "MACD_signal",
+        "MACD_histogram",
+        "BB_upper",
+        "BB_middle",
+        "BB_lower",
+        "BB_width",
+        "Rolling_Std_20",
+        "Return_1d",
+        "Return_5d_lag",
+        "Return_10d_lag",
+        "SMA_ratio",
+        "Price_change_20d"
+      ],
+      "feature_count": 22
+    },
+    "metrics": {
+      "training_set": {
+        "accuracy": 0.7787,
+        "precision": 0.416,
+        "recall": 0.5887,
+        "f1_score": 0.4875
+      },
+      "validation_set": {
+        "accuracy": 0.666,
+        "precision": 0.2635,
+        "recall": 0.4105,
+        "f1_score": 0.321
+      },
+      "test_set": {
+        "accuracy": 0.7146,
+        "precision": 0.2553,
+        "recall": 0.2526,
+        "f1_score": 0.254
+      }
+    }
+  },
+  {
+    "timestamp": "2025-09-16T11:06:24.178809",
+    "model_type": "XGBoost",
+    "model_filename": "xgboost_model_20250916_110624.pkl",
+    "datasets_used": [
+      "OMXS30"
+    ],
+    "parameters": {
+      "n_estimators": 200,
+      "max_depth": 5,
+      "learning_rate": 0.1,
+      "subsample": 0.8,
+      "colsample_bytree": 0.8,
+      "colsample_bylevel": 1.0,
+      "min_child_weight": 50,
+      "reg_alpha": 0.1,
+      "reg_lambda": 1.0,
+      "scale_pos_weight": 4.592452830188679,
+      "random_state": 42,
+      "eval_metric": "logloss",
+      "objective": "binary:logistic"
+    },
+    "features": {
+      "selected_features": [
+        "Open",
+        "High",
+        "Low",
+        "Close",
+        "Volume",
+        "SMA_5",
+        "SMA_10",
+        "SMA_20",
+        "RSI_14",
+        "MACD",
+        "MACD_signal",
+        "MACD_histogram",
+        "BB_upper",
+        "BB_middle",
+        "BB_lower",
+        "BB_width",
+        "Rolling_Std_20",
+        "Return_1d",
+        "Return_5d_lag",
+        "Return_10d_lag",
+        "SMA_ratio",
+        "Price_change_20d"
+      ],
+      "feature_count": 22
+    },
+    "metrics": {
+      "training_set": {
+        "accuracy": 0.863,
+        "precision": 0.5735,
+        "recall": 0.9132,
+        "f1_score": 0.7045
+      },
+      "validation_set": {
+        "accuracy": 0.6356,
+        "precision": 0.1756,
+        "recall": 0.2421,
+        "f1_score": 0.2035
+      },
+      "test_set": {
+        "accuracy": 0.6498,
+        "precision": 0.2132,
+        "recall": 0.3053,
+        "f1_score": 0.2511
+      }
+    }
+  },
+  {
+    "timestamp": "2025-09-16T11:07:25.029323",
+    "model_type": "XGBoost",
+    "model_filename": "xgboost_model_20250916_110725.pkl",
+    "datasets_used": [
+      "OMXS30"
+    ],
+    "parameters": {
+      "n_estimators": 200,
+      "max_depth": 5,
+      "learning_rate": 0.1,
+      "subsample": 0.8,
+      "colsample_bytree": 0.8,
+      "colsample_bylevel": 1.0,
+      "min_child_weight": 50,
+      "reg_alpha": 0.1,
+      "reg_lambda": 1.0,
+      "scale_pos_weight": 4.592452830188679,
+      "random_state": 42,
+      "eval_metric": "logloss",
+      "objective": "binary:logistic"
+    },
+    "features": {
+      "selected_features": [
+        "Open",
+        "High",
+        "Low",
+        "Close",
+        "Volume",
+        "SMA_5",
+        "SMA_10",
+        "SMA_20",
+        "RSI_14",
+        "MACD",
+        "MACD_signal",
+        "MACD_histogram",
+        "BB_upper",
+        "BB_middle",
+        "BB_lower",
+        "BB_width",
+        "Rolling_Std_20",
+        "Return_1d",
+        "Return_5d_lag",
+        "Return_10d_lag",
+        "SMA_ratio",
+        "Price_change_20d"
+      ],
+      "feature_count": 22
+    },
+    "metrics": {
+      "training_set": {
+        "accuracy": 0.863,
+        "precision": 0.5735,
+        "recall": 0.9132,
+        "f1_score": 0.7045
+      },
+      "validation_set": {
+        "accuracy": 0.6356,
+        "precision": 0.1756,
+        "recall": 0.2421,
+        "f1_score": 0.2035
+      },
+      "test_set": {
+        "accuracy": 0.6498,
+        "precision": 0.2132,
+        "recall": 0.3053,
+        "f1_score": 0.2511
+      }
+    }
+  },
+  {
+    "timestamp": "2025-09-16T11:07:56.456528",
+    "model_filename": "random_forest_model_20250916_110756.pkl",
+    "datasets_used": [
+      "OMXS30",
+      "SP500"
+    ],
+    "parameters": {
+      "n_estimators": 200,
+      "max_depth": 5,
+      "min_samples_split": 100,
+      "min_samples_leaf": 50,
+      "max_features": 0.5,
+      "max_samples": 0.8,
+      "bootstrap": true,
+      "class_weight": {
+        "0": 1.0,
+        "1": 4.592452830188679
+      },
+      "random_state": 42,
+      "oob_score": 0.7145748987854251
+    },
+    "features": {
+      "selected_features": [
+        "Open",
+        "High",
+        "Low",
+        "Close",
+        "Volume",
+        "SMA_5",
+        "SMA_10",
+        "SMA_20",
+        "RSI_14",
+        "MACD",
+        "MACD_signal",
+        "MACD_histogram",
+        "BB_upper",
+        "BB_middle",
+        "BB_lower",
+        "BB_width",
+        "Rolling_Std_20",
+        "Return_1d",
+        "Return_5d_lag",
+        "Return_10d_lag",
+        "SMA_ratio",
+        "Price_change_20d"
+      ],
+      "feature_count": 22
+    },
+    "metrics": {
+      "training_set": {
+        "accuracy": 0.7767,
+        "precision": 0.427,
+        "recall": 0.7283,
+        "f1_score": 0.5384
+      },
+      "validation_set": {
+        "accuracy": 0.581,
+        "precision": 0.2565,
+        "recall": 0.6211,
+        "f1_score": 0.3631
+      },
+      "test_set": {
+        "accuracy": 0.6943,
+        "precision": 0.2971,
+        "recall": 0.4316,
+        "f1_score": 0.3519
+      }
+    }
+  },
+  {
+    "timestamp": "2025-09-16T11:08:18.726519",
+    "model_type": "XGBoost",
+    "model_filename": "xgboost_model_20250916_110818.pkl",
+    "datasets_used": [
+      "OMXS30"
+    ],
+    "parameters": {
+      "n_estimators": 200,
+      "max_depth": 5,
+      "learning_rate": 0.1,
+      "subsample": 0.8,
+      "colsample_bytree": 0.8,
+      "colsample_bylevel": 1.0,
+      "min_child_weight": 50,
+      "reg_alpha": 0.1,
+      "reg_lambda": 1.0,
+      "scale_pos_weight": 4.592452830188679,
+      "random_state": 42,
+      "eval_metric": "logloss",
+      "objective": "binary:logistic"
+    },
+    "features": {
+      "selected_features": [
+        "Open",
+        "High",
+        "Low",
+        "Close",
+        "Volume",
+        "SMA_5",
+        "SMA_10",
+        "SMA_20",
+        "RSI_14",
+        "MACD",
+        "MACD_signal",
+        "MACD_histogram",
+        "BB_upper",
+        "BB_middle",
+        "BB_lower",
+        "BB_width",
+        "Rolling_Std_20",
+        "Return_1d",
+        "Return_5d_lag",
+        "Return_10d_lag",
+        "SMA_ratio",
+        "Price_change_20d"
+      ],
+      "feature_count": 22
+    },
+    "metrics": {
+      "training_set": {
+        "accuracy": 0.863,
+        "precision": 0.5735,
+        "recall": 0.9132,
+        "f1_score": 0.7045
+      },
+      "validation_set": {
+        "accuracy": 0.6356,
+        "precision": 0.1756,
+        "recall": 0.2421,
+        "f1_score": 0.2035
+      },
+      "test_set": {
+        "accuracy": 0.6498,
+        "precision": 0.2132,
+        "recall": 0.3053,
+        "f1_score": 0.2511
+      }
+    }
+  },
+  {
+    "timestamp": "2025-09-16T11:16:52.871975",
+    "model_type": "XGBoost",
+    "model_filename": "xgboost_model_20250916_111652.pkl",
+    "datasets_used": [
+      "OMXS30"
+    ],
+    "parameters": {
+      "n_estimators": 200,
+      "max_depth": 5,
+      "learning_rate": 0.1,
+      "subsample": 0.8,
+      "colsample_bytree": 0.8,
+      "colsample_bylevel": 1.0,
+      "min_child_weight": 50,
+      "reg_alpha": 0.1,
+      "reg_lambda": 1.0,
+      "random_state": 42,
+      "eval_metric": "mlogloss",
+      "objective": "multi:softprob",
+      "num_class": 3
+    },
+    "features": {
+      "selected_features": [
+        "Open",
+        "High",
+        "Low",
+        "Close",
+        "Volume",
+        "SMA_5",
+        "SMA_10",
+        "SMA_20",
+        "RSI_14",
+        "MACD",
+        "MACD_signal",
+        "MACD_histogram",
+        "BB_upper",
+        "BB_middle",
+        "BB_lower",
+        "BB_width",
+        "Rolling_Std_20",
+        "Return_1d",
+        "Return_5d_lag",
+        "Return_10d_lag",
+        "SMA_ratio",
+        "Price_change_20d"
+      ],
+      "feature_count": 22
+    },
+    "metrics": {
+      "training_set": {
+        "accuracy": 0.8063,
+        "precision": 0.8475,
+        "recall": 0.8063,
+        "f1_score": 0.8139
+      },
+      "validation_set": {
+        "accuracy": 0.4656,
+        "precision": 0.4833,
+        "recall": 0.4656,
+        "f1_score": 0.4705
+      },
+      "test_set": {
+        "accuracy": 0.5891,
+        "precision": 0.5863,
+        "recall": 0.5891,
+        "f1_score": 0.5854
+      }
+    }
   }
 ]

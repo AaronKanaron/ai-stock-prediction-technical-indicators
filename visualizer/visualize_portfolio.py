@@ -111,14 +111,21 @@ class PortfolioVisualizer:
     
     def load_model(self, model_path=None):
         """
-        Load the trained Random Forest model
+        Load the trained machine learning model (XGBoost or Random Forest)
         """
         if model_path is None:
-            # Find the most recent model
-            model_files = [f for f in os.listdir("./models") if f.startswith("random_forest_model") and f.endswith(".pkl")]
-            if not model_files:
-                raise FileNotFoundError("No Random Forest models found in models/ directory")
-            model_path = os.path.join("./models", sorted(model_files)[-1])
+            # Try to find XGBoost model first, then Random Forest
+            xgboost_files = [f for f in os.listdir("./models") if f.startswith("xgboost_model") and f.endswith(".pkl")]
+            rf_files = [f for f in os.listdir("./models") if f.startswith("random_forest_model") and f.endswith(".pkl")]
+            
+            if xgboost_files:
+                model_path = os.path.join("./models", sorted(xgboost_files)[-1])
+                print(f"Found XGBoost model: {sorted(xgboost_files)[-1]}")
+            elif rf_files:
+                model_path = os.path.join("./models", sorted(rf_files)[-1])
+                print(f"Found Random Forest model: {sorted(rf_files)[-1]}")
+            else:
+                raise FileNotFoundError("No XGBoost or Random Forest models found in models/ directory")
         
         print(f"Loading model from: {model_path}")
         self.model = joblib.load(model_path)
@@ -130,8 +137,16 @@ class PortfolioVisualizer:
         """
         data = data.copy()
         
+        # Basic OHLCV data (already present)
+        # data already has: Open, High, Low, Close, Volume
+        
         # Daily return
         data['Return_1d'] = data['Close'].pct_change()
+        
+        # Simple Moving Averages
+        data['SMA_5'] = data['Close'].rolling(window=5).mean()
+        data['SMA_10'] = data['Close'].rolling(window=10).mean()
+        data['SMA_20'] = data['Close'].rolling(window=20).mean()
         
         # MACD
         ema_12 = data['Close'].ewm(span=12).mean()
@@ -147,14 +162,11 @@ class PortfolioVisualizer:
         rs = gain / loss
         data['RSI_14'] = 100 - (100 / (1 + rs))
         
-        # Simple Moving Averages
-        data['SMA_5'] = data['Close'].rolling(window=5).mean()
-        data['SMA_20'] = data['Close'].rolling(window=20).mean()
-        
         # Bollinger Bands
         sma_20 = data['SMA_20']  # Use the SMA_20 we just calculated
         bb_std = data['Close'].rolling(window=20).std()
         data['BB_upper'] = sma_20 + (bb_std * 2)
+        data['BB_middle'] = sma_20  # Same as SMA_20
         data['BB_lower'] = sma_20 - (bb_std * 2)
         data['BB_width'] = data['BB_upper'] - data['BB_lower']
         
@@ -178,11 +190,12 @@ class PortfolioVisualizer:
         # Calculate technical indicators
         data_with_indicators = self.calculate_technical_indicators(data)
         
-        # Model features (same as in main.py - all 11 features used in the combined model)
+        # Model features (based on the XGBoost model log - all 22 features used)
         model_features = [
-            'Return_1d', 'MACD_histogram', 'RSI_14', 'BB_width', 
-            'Volume', 'SMA_5', 'Rolling_Std_20', 'Return_5d_lag',
-            'Return_10d_lag', 'SMA_ratio', 'Price_change_20d'
+            "Open", "High", "Low", "Close", "Volume", "SMA_5", "SMA_10", "SMA_20", 
+            "RSI_14", "MACD", "MACD_signal", "MACD_histogram", "BB_upper", 
+            "BB_middle", "BB_lower", "BB_width", "Rolling_Std_20", "Return_1d", 
+            "Return_5d_lag", "Return_10d_lag", "SMA_ratio", "Price_change_20d"
         ]
         
         # Prepare features for prediction
@@ -191,15 +204,18 @@ class PortfolioVisualizer:
         if feature_data.empty:
             return None
         
-        # Generate predictions (probabilities of positive class)
-        predictions = model.predict_proba(feature_data.values)[:, 1]
+        # Generate predictions for 3-class classification (0=sell, 1=hold, 2=buy)
+        class_predictions = model.predict(feature_data.values)
+        prediction_probabilities = model.predict_proba(feature_data.values)
         
         # Create signals dataframe
         signals_df = pd.DataFrame({
             'Date': data_with_indicators.loc[feature_data.index, 'Date'],
             'Close': data_with_indicators.loc[feature_data.index, 'Close'],
-            'Prediction_Prob': predictions,
-            'Signal': (predictions > 0.5).astype(int)  # 1 = buy/hold, 0 = sell/avoid
+            'Signal': class_predictions,  # 0=sell, 1=hold, 2=buy
+            'Prob_Sell': prediction_probabilities[:, 0],    # Probability of sell (class 0)
+            'Prob_Hold': prediction_probabilities[:, 1],    # Probability of hold (class 1)
+            'Prob_Buy': prediction_probabilities[:, 2]      # Probability of buy (class 2)
         })
         
         return signals_df
@@ -226,14 +242,16 @@ class PortfolioVisualizer:
         # Merge signals with portfolio data
         portfolio_with_signals = pd.merge(
             self.portfolio_data[['Date', 'Close_OMXS30', 'Close_SP500']],
-            omxs30_signals[['Date', 'Signal', 'Prediction_Prob']],
+            omxs30_signals[['Date', 'Signal', 'Prob_Sell', 'Prob_Hold', 'Prob_Buy']],
             on='Date',
             how='left'
         )
         
         # Forward fill signals for missing dates
         portfolio_with_signals['Signal'] = portfolio_with_signals['Signal'].ffill()
-        portfolio_with_signals['Prediction_Prob'] = portfolio_with_signals['Prediction_Prob'].ffill()
+        portfolio_with_signals['Prob_Sell'] = portfolio_with_signals['Prob_Sell'].ffill()
+        portfolio_with_signals['Prob_Hold'] = portfolio_with_signals['Prob_Hold'].ffill()
+        portfolio_with_signals['Prob_Buy'] = portfolio_with_signals['Prob_Buy'].ffill()
         
         # Initialize model portfolio tracking
         cash = initial_investment
@@ -248,13 +266,13 @@ class PortfolioVisualizer:
             sp500_price = row['Close_SP500']
             
             if pd.isna(current_signal):
-                current_signal = 0  # Default to no position
+                current_signal = 1  # Default to hold position
             
             # Current portfolio value
             current_value = cash + (omxs30_shares * omxs30_price) + (sp500_shares * sp500_price)
             
-            # Trading logic based on signal
-            if current_signal == 1:  # Buy signal
+            # Trading logic based on 3-class signal
+            if current_signal == 2:  # Buy signal
                 if cash > 0:
                     # Invest all cash in 50/50 split
                     omxs30_investment = cash * 0.5
@@ -266,10 +284,12 @@ class PortfolioVisualizer:
                     
             elif current_signal == 0:  # Sell signal
                 if omxs30_shares > 0 or sp500_shares > 0:
-                    # Sell all positions
+                    # Sell all positions and move to cash
                     cash = (omxs30_shares * omxs30_price) + (sp500_shares * sp500_price)
                     omxs30_shares = 0
                     sp500_shares = 0
+                    
+            # For signal == 1 (hold), do nothing - maintain current positions
             
             # Recalculate portfolio value after trading
             portfolio_value = cash + (omxs30_shares * omxs30_price) + (sp500_shares * sp500_price)
@@ -402,28 +422,34 @@ class PortfolioVisualizer:
             ax2_price.set_ylabel('OMXS30 Price', fontsize=12, color='gray')
             ax2_price.tick_params(axis='y', labelcolor='gray')
             
-            # Plot buy/sell signals
-            buy_signals = self.model_portfolio_data[self.model_portfolio_data['Signal'] == 1]
+            # Plot buy/hold/sell signals
+            buy_signals = self.model_portfolio_data[self.model_portfolio_data['Signal'] == 2]
+            hold_signals = self.model_portfolio_data[self.model_portfolio_data['Signal'] == 1]
             sell_signals = self.model_portfolio_data[self.model_portfolio_data['Signal'] == 0]
             
             # Plot buy signals (green triangles pointing up)
             if not buy_signals.empty:
-                ax2.scatter(buy_signals['Date'], [1] * len(buy_signals), 
-                           color='green', marker='^', s=20, alpha=0.7, label='Buy Signal')
+                ax2.scatter(buy_signals['Date'], [2] * len(buy_signals), 
+                           color='green', marker='^', s=30, alpha=0.8, label='Buy Signal')
+            
+            # Plot hold signals (blue circles)
+            if not hold_signals.empty:
+                ax2.scatter(hold_signals['Date'], [1] * len(hold_signals), 
+                           color='blue', marker='o', s=15, alpha=0.6, label='Hold Signal')
             
             # Plot sell signals (red triangles pointing down)
             if not sell_signals.empty:
                 ax2.scatter(sell_signals['Date'], [0] * len(sell_signals), 
-                           color='red', marker='v', s=20, alpha=0.7, label='Sell Signal')
+                           color='red', marker='v', s=30, alpha=0.8, label='Sell Signal')
             
-            ax2.set_ylim(-0.1, 1.1)
-            ax2.set_yticks([0, 1])
-            ax2.set_yticklabels(['Sell/Cash', 'Buy/Hold'])
+            ax2.set_ylim(-0.2, 2.2)
+            ax2.set_yticks([0, 1, 2])
+            ax2.set_yticklabels(['Sell', 'Hold', 'Buy'])
         else:
             ax2.text(0.5, 0.5, 'No model signals available', 
                     transform=ax2.transAxes, ha='center', va='center', fontsize=14)
         
-        ax2.set_title('Model Trading Signals', fontsize=16, fontweight='bold')
+        ax2.set_title('Model Trading Signals (0=Sell, 1=Hold, 2=Buy)', fontsize=16, fontweight='bold')
         ax2.set_xlabel('Date', fontsize=12)
         ax2.set_ylabel('Signal', fontsize=12)
         ax2.legend(loc='upper left', fontsize=10)
@@ -500,8 +526,11 @@ class PortfolioVisualizer:
         print(f"\n📊 MODEL STRATEGY DETAILS:")
         print(f"  Total trading signals generated: {len(signals)}")
         print(f"  Signal changes (trades): {signal_changes}")
-        print(f"  Time in market: {(signals == 1).mean()*100:.1f}%")
-        print(f"  Time in cash: {(signals == 0).mean()*100:.1f}%")
+        print(f"  Time selling (Signal=0): {(signals == 0).mean()*100:.1f}%")
+        print(f"  Time holding (Signal=1): {(signals == 1).mean()*100:.1f}%")
+        print(f"  Time buying (Signal=2): {(signals == 2).mean()*100:.1f}%")
+        print(f"  Time in market (Hold+Buy): {((signals == 1) | (signals == 2)).mean()*100:.1f}%")
+        print(f"  Time in cash (Sell): {(signals == 0).mean()*100:.1f}%")
         
         print("="*90)
         
@@ -512,7 +541,10 @@ class PortfolioVisualizer:
                 'total_return': model_total_return,
                 'annual_return': model_annual_return,
                 'trades': signal_changes,
-                'time_in_market': (signals == 1).mean()*100
+                'time_selling': (signals == 0).mean()*100,
+                'time_holding': (signals == 1).mean()*100,
+                'time_buying': (signals == 2).mean()*100,
+                'time_in_market': ((signals == 1) | (signals == 2)).mean()*100
             }
         }
 
@@ -537,8 +569,8 @@ def main():
     )
     
     try:
-        # Load the Random Forest model
-        print("\n🤖 Loading Random Forest model...")
+        # Load the machine learning model (XGBoost or Random Forest)
+        print("\n🤖 Loading trained model...")
         visualizer.load_model()
         
         # Simulate model-based trading strategy

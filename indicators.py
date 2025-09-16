@@ -57,15 +57,37 @@ def calculate_technical_indicators(df):
     data['Price_change_20d'] = data['Close'] / data['Close'].shift(20) - 1
     
     # Target: 1 if 5-day future return > 2%, 0 otherwise
+    threshold = 0.02 
     data['Future_Close_5d'] = data['Close'].shift(-5)
     data['Return_5d'] = (data['Future_Close_5d'] - data['Close']) / data['Close']
-    threshold = 0.015  # 2% threshold
-    data['Target'] = (data['Return_5d'] > threshold).astype(int)
+    data['Target'] = 1
+    data.loc[data['Return_5d'] > threshold, 'Target'] = 2
+    data.loc[data['Return_5d'] < -threshold, 'Target'] = 0
     
     # Remove the helper column
     data = data.drop(['Future_Close_5d', 'Return_5d'], axis=1)
     
-    return data
+    # Store original shape for reporting
+    original_shape = data.shape
+    
+    # Remove rows with NaN values (typically the first rows due to technical indicators)
+    data_cleaned = data.dropna()
+    
+    # Remove the last 5 rows since they don't have valid targets (5-day look-ahead)
+    if len(data_cleaned) > 5:
+        data_cleaned = data_cleaned.iloc[:-5]
+    
+    # Print cleaning statistics
+    rows_removed_nan = original_shape[0] - len(data.dropna())
+    rows_removed_total = original_shape[0] - len(data_cleaned)
+    print(f"Data cleaning summary:")
+    print(f"  Original rows: {original_shape[0]}")
+    print(f"  Rows with NaN removed: {rows_removed_nan}")
+    print(f"  Last 5 rows removed (target look-ahead): 5")
+    print(f"  Total rows removed: {rows_removed_total}")
+    print(f"  Final clean dataset: {len(data_cleaned)} rows")
+    
+    return data_cleaned
 
 def process_stock_data(input_file, output_file):
     """

@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from sklearn.ensemble import RandomForestClassifier
+from xgboost import XGBClassifier
 from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
 from sklearn.metrics import precision_score, recall_score, f1_score
 import matplotlib.pyplot as plt
@@ -94,68 +94,82 @@ def prepare_features(df, selected_features=None, drop_columns=None):
 
 def compute_class_weights(y_train):
     """
-    Compute manual ratio-based class weights for imbalanced dataset.
+    Compute class weights for multiclass imbalanced dataset.
     
     Parameters:
     y_train (Series): Training targets
     
     Returns:
-    dict: Manual ratio-based class weights
+    dict: Class weights for each class
     """
     # Analyze class distribution
     class_counts = y_train.value_counts().sort_index()
-    class_0_count = class_counts[0]
-    class_1_count = class_counts[1]
+    total_samples = len(y_train)
+    n_classes = len(class_counts)
     
-    # Manual ratio-based weighting for minority class
-    manual_weights = {
-        0: 1.0,  # Majority class baseline
-        1: class_0_count / class_1_count  # Ratio-based weight
-    }
+    # Compute balanced class weights
+    class_weights = {}
+    for class_label in class_counts.index:
+        class_weights[class_label] = total_samples / (n_classes * class_counts[class_label])
     
-    print(f"Class weights: {manual_weights}")
+    print(f"Class distribution: {dict(class_counts)}")
+    print(f"Class weights: {class_weights}")
     
-    return manual_weights
+    return class_weights
 
-def train_random_forest(X_train, y_train, class_weights=None, **rf_params):
+def train_xgboost(X_train, y_train, class_weights=None, **xgb_params):
     """
-    Train a Random Forest classifier.
+    Train an XGBoost classifier.
     
     Parameters:
     X_train (DataFrame): Training features
     y_train (Series): Training targets
     class_weights (dict or str): Class weights to handle imbalanced data
-    **rf_params: Random Forest parameters
+    **xgb_params: XGBoost parameters
     
     Returns:
-    RandomForestClassifier: Trained model
+    XGBClassifier: Trained model
     """
-    # Default parameters for Random Forest
+    # Default parameters for XGBoost
     default_params = {
         'n_estimators': 200,
         'max_depth': 5,
-        'min_samples_split': 100,
-        'min_samples_leaf': 50,
-        'max_features': 0.5,
-        'max_samples': 0.8,
-        'bootstrap': True,
-        'oob_score': True,
-        'class_weight': class_weights if class_weights is not None else 'balanced',
-        # 'class_weight': {0: 1.0, 1: 4.0},
+        'learning_rate': 0.1,
+        'subsample': 0.8,
+        'colsample_bytree': 0.8,
+        'colsample_bylevel': 1.0,
+        'min_child_weight': 50,
+        'reg_alpha': 0.1,  # L1 regularization
+        'reg_lambda': 1.0,  # L2 regularization
         'random_state': 42,
-        'n_jobs': -1
+        'n_jobs': -1,
+        'eval_metric': 'mlogloss',  # Changed to mlogloss for multiclass
+        'objective': 'multi:softprob',  # Changed to softprob for multiclass
+        'num_class': 3  # Added for 3-class classification (0=sell, 1=hold, 2=buy)
     }
     
+    # Handle class imbalance (for multiclass, we'll use class_weight parameter)
+    if class_weights is not None and isinstance(class_weights, dict):
+        # For multiclass, XGBoost doesn't use scale_pos_weight
+        # Instead, we can handle imbalance through sample_weight during fit
+        print("Note: Class weights will be handled through sample weighting for multiclass")
+    
     # Update with any provided parameters
-    default_params.update(rf_params)
+    default_params.update(xgb_params)
     
     # Create and train the model
-    rf_model = RandomForestClassifier(**default_params)
-    rf_model.fit(X_train, y_train)
+    xgb_model = XGBClassifier(**default_params)
     
-    print(f"Model trained. OOB Score: {rf_model.oob_score_:.4f}")
+    # Handle class imbalance through sample weights if provided
+    if class_weights is not None and isinstance(class_weights, dict):
+        sample_weights = [class_weights.get(label, 1.0) for label in y_train]
+        xgb_model.fit(X_train, y_train, sample_weight=sample_weights)
+    else:
+        xgb_model.fit(X_train, y_train)
     
-    return rf_model
+    print(f"Model trained for multiclass classification (3 classes)")
+    
+    return xgb_model
 
 def evaluate_model(model, X, y, dataset_name="Dataset"):
     """
@@ -172,13 +186,13 @@ def evaluate_model(model, X, y, dataset_name="Dataset"):
     """
     # Make predictions
     y_pred = model.predict(X)
-    y_pred_proba = model.predict_proba(X)[:, 1]  # Probability of positive class
+    y_pred_proba = model.predict_proba(X)  # All class probabilities for multiclass
     
-    # Calculate metrics
+    # Calculate metrics (using 'weighted' average for multiclass)
     accuracy = accuracy_score(y, y_pred)
-    precision = precision_score(y, y_pred)
-    recall = recall_score(y, y_pred)
-    f1 = f1_score(y, y_pred)
+    precision = precision_score(y, y_pred, average='weighted')
+    recall = recall_score(y, y_pred, average='weighted')
+    f1 = f1_score(y, y_pred, average='weighted')
     
     print(f"{dataset_name}: Acc={accuracy:.4f}, Prec={precision:.4f}, Rec={recall:.4f}, F1={f1:.4f}")
     
@@ -197,10 +211,10 @@ def evaluate_model(model, X, y, dataset_name="Dataset"):
 
 def plot_feature_importance(model, feature_names, top_n=15):
     """
-    Plot feature importance from the trained Random Forest model.
+    Plot feature importance from the trained XGBoost model.
     
     Parameters:
-    model: Trained RandomForestClassifier
+    model: Trained XGBClassifier
     feature_names (list): List of feature names
     top_n (int): Number of top features to display
     """
@@ -218,7 +232,7 @@ def plot_feature_importance(model, feature_names, top_n=15):
     plt.barh(range(len(top_features)), top_features['importance'])
     plt.yticks(range(len(top_features)), top_features['feature'])
     plt.xlabel('Feature Importance')
-    plt.title(f'Top {top_n} Feature Importances - Random Forest')
+    plt.title(f'Top {top_n} Feature Importances - XGBoost')
     plt.gca().invert_yaxis()
     plt.tight_layout()
     
@@ -233,7 +247,7 @@ def log_training_results(model, metrics, selected_features, class_weights, model
     Log training results to log.json file.
     
     Parameters:
-    model: Trained RandomForestClassifier
+    model: Trained XGBClassifier
     metrics (dict): Dictionary containing train/val/test metrics
     selected_features (list): List of features used in training
     class_weights (dict): Class weights used in training
@@ -243,19 +257,23 @@ def log_training_results(model, metrics, selected_features, class_weights, model
     # Create log entry
     log_entry = {
         'timestamp': datetime.datetime.now().isoformat(),
+        'model_type': 'XGBoost',
         'model_filename': model_filename,
         'datasets_used': datasets_used,
         'parameters': {
             'n_estimators': model.n_estimators,
             'max_depth': model.max_depth,
-            'min_samples_split': model.min_samples_split,
-            'min_samples_leaf': model.min_samples_leaf,
-            'max_features': model.max_features,
-            'max_samples': model.max_samples,
-            'bootstrap': model.bootstrap,
-            'class_weight': dict(model.class_weight) if hasattr(model.class_weight, 'items') else model.class_weight,
+            'learning_rate': model.learning_rate,
+            'subsample': model.subsample,
+            'colsample_bytree': model.colsample_bytree,
+            'colsample_bylevel': model.colsample_bylevel,
+            'min_child_weight': model.min_child_weight,
+            'reg_alpha': model.reg_alpha,
+            'reg_lambda': model.reg_lambda,
             'random_state': model.random_state,
-            'oob_score': model.oob_score_
+            'eval_metric': model.eval_metric,
+            'objective': model.objective,
+            'num_class': getattr(model, 'num_class', 3)  # Default to 3 for multiclass
         },
         'features': {
             'selected_features': selected_features,
@@ -307,10 +325,10 @@ def log_training_results(model, metrics, selected_features, class_weights, model
 
 def main():
     """
-    Main function to train the optimal Random Forest model.
+    Main function to train the optimal XGBoost model.
     """
     print("=" * 60)
-    print("Random Forest Model Training for Stock Price Prediction")
+    print("XGBoost Model Training for Stock Price Prediction")
     print("=" * 60)
     
     # Use all available features instead of a selected subset
@@ -331,44 +349,45 @@ def main():
         class_weights = compute_class_weights(y_train)
         
         # 4. Train the optimal model
-        print("\nTraining Random Forest with optimal configuration...")
-        rf_model = train_random_forest(X_train, y_train, class_weights=class_weights)
+        print("\nTraining XGBoost with optimal configuration...")
+        xgb_model = train_xgboost(X_train, y_train, class_weights=class_weights)
         
         # 5. Evaluate the model
         print("\n=== Model Evaluation ===")
-        train_metrics = evaluate_model(rf_model, X_train, y_train, "Training Set")
-        val_metrics = evaluate_model(rf_model, X_val, y_val, "Validation Set")
-        test_metrics = evaluate_model(rf_model, X_test, y_test, "Test Set")
+        train_metrics = evaluate_model(xgb_model, X_train, y_train, "Training Set")
+        val_metrics = evaluate_model(xgb_model, X_val, y_val, "Validation Set")
+        test_metrics = evaluate_model(xgb_model, X_test, y_test, "Test Set")
         
         # 6. Show feature importance
         print("\n=== Feature Importance ===")
-        feature_importance = plot_feature_importance(rf_model, X_train.columns, top_n=15)  # Show top 15 features
+        feature_importance = plot_feature_importance(xgb_model, X_train.columns, top_n=15)  # Show top 15 features
         
         # Get the actual features used for logging
         actual_features_used = list(X_train.columns)
         
         # 7. Save the model
-        model_filename = f'random_forest_model_{datetime.datetime.now().strftime("%Y%m%d_%H%M%S")}.pkl'
-        joblib.dump(rf_model, "models/" + model_filename)
+        model_filename = f'xgboost_model_{datetime.datetime.now().strftime("%Y%m%d_%H%M%S")}.pkl'
+        joblib.dump(xgb_model, "models/" + model_filename)
         print(f"\n✅ Model saved as '{model_filename}'")
         
         # 8. Log training results
         print(f"\n=== LOGGING RESULTS ===")
-        log_training_results(rf_model, {
+        log_training_results(xgb_model, {
             'train': train_metrics,
             'val': val_metrics,
             'test': test_metrics
-        }, actual_features_used, class_weights, model_filename, datasets_used=['OMXS30', 'SP500'])
+        }, actual_features_used, class_weights, model_filename, datasets_used=['OMXS30'])
         
         # 9. Summary
         print(f"\n=== FINAL MODEL SUMMARY ===")
+        print(f"Model Type: XGBoost")
         print(f"Features: {len(actual_features_used)}")
         print(f"Test Accuracy: {test_metrics['accuracy']:.4f}")
         print(f"Test F1-Score: {test_metrics['f1_score']:.4f}")
         print(f"Test Recall: {test_metrics['recall']:.4f}")
         
         return {
-            'model': rf_model,
+            'model': xgb_model,
             'metrics': {
                 'train': train_metrics,
                 'val': val_metrics,
