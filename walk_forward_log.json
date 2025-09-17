@@ -1,0 +1,956 @@
+[
+  {
+    "timestamp": "2025-09-16T18:32:22.334405",
+    "validation_type": "walk_forward",
+    "model_type": "XGBoost",
+    "model_filename": "walkforward_xgboost_model_20250916_183222.pkl",
+    "best_split": 14,
+    "total_splits": 15,
+    "parameters": {
+      "n_estimators": 300,
+      "max_depth": 5,
+      "learning_rate": 0.1,
+      "subsample": 0.8,
+      "colsample_bytree": 0.8,
+      "min_child_weight": 50.0,
+      "reg_alpha": 0.1,
+      "reg_lambda": 1.0,
+      "random_state": 42
+    },
+    "features": {
+      "feature_count": 22,
+      "top_10_features": [
+        "BB_middle",
+        "RSI_14",
+        "SMA_20",
+        "BB_width",
+        "Low",
+        "High",
+        "Close",
+        "Rolling_Std_20",
+        "SMA_5",
+        "MACD_signal"
+      ]
+    },
+    "summary_metrics": {
+      "mean_train_accuracy": 0.8181654498413188,
+      "mean_val_accuracy": 0.5069154205104099,
+      "mean_test_accuracy": 0.42662464580927034,
+      "std_test_accuracy": 0.1427389794255684,
+      "mean_train_f1": 0.8258491309274755,
+      "mean_val_f1": 0.5178942124658152,
+      "mean_test_f1": 0.4376601458140294,
+      "std_test_f1": 0.12727178218816992
+    },
+    "split_details": [
+      {
+        "split_num": 1,
+        "test_period": "2018-02-04 to 2018-05-04",
+        "test_accuracy": 0.5573770491803278,
+        "test_f1_score": 0.5144677068931464,
+        "val_test_gap": 0.0555261766261238
+      },
+      {
+        "split_num": 2,
+        "test_period": "2018-08-04 to 2018-11-04",
+        "test_accuracy": 0.6,
+        "test_f1_score": 0.5750150302186501,
+        "val_test_gap": 0.11428571428571432
+      },
+      {
+        "split_num": 3,
+        "test_period": "2019-02-04 to 2019-05-04",
+        "test_accuracy": 0.6290322580645161,
+        "test_f1_score": 0.5783855700233375,
+        "val_test_gap": -0.17903225806451611
+      },
+      {
+        "split_num": 4,
+        "test_period": "2019-08-04 to 2019-11-04",
+        "test_accuracy": 0.359375,
+        "test_f1_score": 0.3554207616707617,
+        "val_test_gap": 0.20729166666666665
+      },
+      {
+        "split_num": 5,
+        "test_period": "2020-02-04 to 2020-05-04",
+        "test_accuracy": 0.3442622950819672,
+        "test_f1_score": 0.31705469072875053,
+        "val_test_gap": 0.03907103825136615
+      },
+      {
+        "split_num": 6,
+        "test_period": "2020-08-04 to 2020-11-04",
+        "test_accuracy": 0.3333333333333333,
+        "test_f1_score": 0.3786249592701206,
+        "val_test_gap": -0.08333333333333331
+      },
+      {
+        "split_num": 7,
+        "test_period": "2021-02-04 to 2021-05-04",
+        "test_accuracy": 0.13333333333333333,
+        "test_f1_score": 0.2169491525423729,
+        "val_test_gap": 0.19453551912568304
+      },
+      {
+        "split_num": 8,
+        "test_period": "2021-08-04 to 2021-11-04",
+        "test_accuracy": 0.3787878787878788,
+        "test_f1_score": 0.45260954322166685,
+        "val_test_gap": 0.19933712121212122
+      },
+      {
+        "split_num": 9,
+        "test_period": "2022-02-04 to 2022-05-04",
+        "test_accuracy": 0.3114754098360656,
+        "test_f1_score": 0.2825190357720318,
+        "val_test_gap": 0.02185792349726773
+      },
+      {
+        "split_num": 10,
+        "test_period": "2022-08-04 to 2022-11-04",
+        "test_accuracy": 0.36363636363636365,
+        "test_f1_score": 0.370971620971621,
+        "val_test_gap": 0.017316017316017285
+      },
+      {
+        "split_num": 11,
+        "test_period": "2023-02-04 to 2023-05-04",
+        "test_accuracy": 0.5833333333333334,
+        "test_f1_score": 0.5703703703703703,
+        "val_test_gap": -0.05208333333333337
+      },
+      {
+        "split_num": 12,
+        "test_period": "2023-08-04 to 2023-11-04",
+        "test_accuracy": 0.2878787878787879,
+        "test_f1_score": 0.3347086460092857,
+        "val_test_gap": 0.39466089466089466
+      },
+      {
+        "split_num": 13,
+        "test_period": "2024-02-04 to 2024-05-04",
+        "test_accuracy": 0.6451612903225806,
+        "test_f1_score": 0.6842769365810841,
+        "val_test_gap": -0.1935483870967742
+      },
+      {
+        "split_num": 14,
+        "test_period": "2024-08-04 to 2024-11-04",
+        "test_accuracy": 0.4461538461538462,
+        "test_f1_score": 0.5188704965920156,
+        "val_test_gap": 0.3280397022332506
+      },
+      {
+        "split_num": 15,
+        "test_period": "2025-02-04 to 2025-05-04",
+        "test_accuracy": 0.4262295081967213,
+        "test_f1_score": 0.4146576663452266,
+        "val_test_gap": 0.14043715846994537
+      }
+    ]
+  },
+  {
+    "timestamp": "2025-09-17T09:47:11.501689",
+    "validation_type": "walk_forward",
+    "model_type": "XGBoost",
+    "model_filename": "walkforward_xgboost_model_20250917_094711.pkl",
+    "best_split": 14,
+    "total_splits": 15,
+    "parameters": {
+      "n_estimators": 300,
+      "max_depth": 5,
+      "learning_rate": 0.1,
+      "subsample": 0.8,
+      "colsample_bytree": 0.8,
+      "min_child_weight": 50.0,
+      "reg_alpha": 0.1,
+      "reg_lambda": 1.0,
+      "random_state": 42
+    },
+    "features": {
+      "feature_count": 22,
+      "top_10_features": [
+        "BB_middle",
+        "RSI_14",
+        "SMA_20",
+        "BB_width",
+        "Low",
+        "High",
+        "Close",
+        "Rolling_Std_20",
+        "SMA_5",
+        "MACD_signal"
+      ]
+    },
+    "summary_metrics": {
+      "mean_train_accuracy": 0.8181654498413188,
+      "mean_val_accuracy": 0.5069154205104099,
+      "mean_test_accuracy": 0.42662464580927034,
+      "std_test_accuracy": 0.1427389794255684,
+      "mean_train_f1": 0.8258491309274755,
+      "mean_val_f1": 0.5178942124658152,
+      "mean_test_f1": 0.4376601458140294,
+      "std_test_f1": 0.12727178218816992
+    },
+    "split_details": [
+      {
+        "split_num": 1,
+        "test_period": "2018-02-04 to 2018-05-04",
+        "test_accuracy": 0.5573770491803278,
+        "test_f1_score": 0.5144677068931464,
+        "val_test_gap": 0.0555261766261238
+      },
+      {
+        "split_num": 2,
+        "test_period": "2018-08-04 to 2018-11-04",
+        "test_accuracy": 0.6,
+        "test_f1_score": 0.5750150302186501,
+        "val_test_gap": 0.11428571428571432
+      },
+      {
+        "split_num": 3,
+        "test_period": "2019-02-04 to 2019-05-04",
+        "test_accuracy": 0.6290322580645161,
+        "test_f1_score": 0.5783855700233375,
+        "val_test_gap": -0.17903225806451611
+      },
+      {
+        "split_num": 4,
+        "test_period": "2019-08-04 to 2019-11-04",
+        "test_accuracy": 0.359375,
+        "test_f1_score": 0.3554207616707617,
+        "val_test_gap": 0.20729166666666665
+      },
+      {
+        "split_num": 5,
+        "test_period": "2020-02-04 to 2020-05-04",
+        "test_accuracy": 0.3442622950819672,
+        "test_f1_score": 0.31705469072875053,
+        "val_test_gap": 0.03907103825136615
+      },
+      {
+        "split_num": 6,
+        "test_period": "2020-08-04 to 2020-11-04",
+        "test_accuracy": 0.3333333333333333,
+        "test_f1_score": 0.3786249592701206,
+        "val_test_gap": -0.08333333333333331
+      },
+      {
+        "split_num": 7,
+        "test_period": "2021-02-04 to 2021-05-04",
+        "test_accuracy": 0.13333333333333333,
+        "test_f1_score": 0.2169491525423729,
+        "val_test_gap": 0.19453551912568304
+      },
+      {
+        "split_num": 8,
+        "test_period": "2021-08-04 to 2021-11-04",
+        "test_accuracy": 0.3787878787878788,
+        "test_f1_score": 0.45260954322166685,
+        "val_test_gap": 0.19933712121212122
+      },
+      {
+        "split_num": 9,
+        "test_period": "2022-02-04 to 2022-05-04",
+        "test_accuracy": 0.3114754098360656,
+        "test_f1_score": 0.2825190357720318,
+        "val_test_gap": 0.02185792349726773
+      },
+      {
+        "split_num": 10,
+        "test_period": "2022-08-04 to 2022-11-04",
+        "test_accuracy": 0.36363636363636365,
+        "test_f1_score": 0.370971620971621,
+        "val_test_gap": 0.017316017316017285
+      },
+      {
+        "split_num": 11,
+        "test_period": "2023-02-04 to 2023-05-04",
+        "test_accuracy": 0.5833333333333334,
+        "test_f1_score": 0.5703703703703703,
+        "val_test_gap": -0.05208333333333337
+      },
+      {
+        "split_num": 12,
+        "test_period": "2023-08-04 to 2023-11-04",
+        "test_accuracy": 0.2878787878787879,
+        "test_f1_score": 0.3347086460092857,
+        "val_test_gap": 0.39466089466089466
+      },
+      {
+        "split_num": 13,
+        "test_period": "2024-02-04 to 2024-05-04",
+        "test_accuracy": 0.6451612903225806,
+        "test_f1_score": 0.6842769365810841,
+        "val_test_gap": -0.1935483870967742
+      },
+      {
+        "split_num": 14,
+        "test_period": "2024-08-04 to 2024-11-04",
+        "test_accuracy": 0.4461538461538462,
+        "test_f1_score": 0.5188704965920156,
+        "val_test_gap": 0.3280397022332506
+      },
+      {
+        "split_num": 15,
+        "test_period": "2025-02-04 to 2025-05-04",
+        "test_accuracy": 0.4262295081967213,
+        "test_f1_score": 0.4146576663452266,
+        "val_test_gap": 0.14043715846994537
+      }
+    ]
+  },
+  {
+    "timestamp": "2025-09-17T15:33:10.409405",
+    "validation_type": "walk_forward",
+    "model_type": "XGBoost",
+    "model_filename": "walkforward_xgboost_combined_OMXS30_SP500_20250917_153310.pkl",
+    "datasets_used": [
+      "OMXS30",
+      "SP500"
+    ],
+    "combined_datasets": true,
+    "best_split": 1,
+    "total_splits": 15,
+    "parameters": {
+      "n_estimators": 300,
+      "max_depth": 5,
+      "learning_rate": 0.1,
+      "subsample": 0.8,
+      "colsample_bytree": 0.8,
+      "min_child_weight": 50.0,
+      "reg_alpha": 0.1,
+      "reg_lambda": 1.0,
+      "random_state": 42
+    },
+    "features": {
+      "feature_count": 22,
+      "top_10_features": [
+        "RSI_14",
+        "BB_middle",
+        "BB_upper",
+        "BB_width",
+        "High",
+        "Rolling_Std_20",
+        "Low",
+        "Open",
+        "Close",
+        "Volume"
+      ]
+    },
+    "summary_metrics": {
+      "mean_train_accuracy": 0.8388508856381218,
+      "mean_val_accuracy": 0.5320852482043467,
+      "mean_test_accuracy": 0.4608098478362628,
+      "std_test_accuracy": 0.1336410691686734,
+      "mean_train_f1": 0.847418996241521,
+      "mean_val_f1": 0.5474840924453813,
+      "mean_test_f1": 0.4743735457825328,
+      "std_test_f1": 0.13394564005702514
+    },
+    "split_details": [
+      {
+        "split_num": 1,
+        "test_period": "2018-02-04 to 2018-05-04",
+        "test_accuracy": 0.5203252032520326,
+        "test_f1_score": 0.5007451568962693,
+        "val_test_gap": 0.2764227642276422
+      },
+      {
+        "split_num": 2,
+        "test_period": "2018-08-04 to 2018-11-04",
+        "test_accuracy": 0.627906976744186,
+        "test_f1_score": 0.6165455216618005,
+        "val_test_gap": 0.06500640908258559
+      },
+      {
+        "split_num": 3,
+        "test_period": "2019-02-04 to 2019-05-04",
+        "test_accuracy": 0.616,
+        "test_f1_score": 0.5680558696375125,
+        "val_test_gap": -0.17433333333333334
+      },
+      {
+        "split_num": 4,
+        "test_period": "2019-08-04 to 2019-11-04",
+        "test_accuracy": 0.3203125,
+        "test_f1_score": 0.3539223035575053,
+        "val_test_gap": 0.24066310975609762
+      },
+      {
+        "split_num": 5,
+        "test_period": "2020-02-04 to 2020-05-04",
+        "test_accuracy": 0.43902439024390244,
+        "test_f1_score": 0.43331874408614446,
+        "val_test_gap": 0.24950019992003197
+      },
+      {
+        "split_num": 6,
+        "test_period": "2020-08-04 to 2020-11-04",
+        "test_accuracy": 0.25190839694656486,
+        "test_f1_score": 0.2698241834001622,
+        "val_test_gap": -0.02534589694656486
+      },
+      {
+        "split_num": 7,
+        "test_period": "2021-02-04 to 2021-05-04",
+        "test_accuracy": 0.36363636363636365,
+        "test_f1_score": 0.4638926579225087,
+        "val_test_gap": -0.06282335550628232
+      },
+      {
+        "split_num": 8,
+        "test_period": "2021-08-04 to 2021-11-04",
+        "test_accuracy": 0.5954198473282443,
+        "test_f1_score": 0.6349277360928627,
+        "val_test_gap": 0.17801765267175573
+      },
+      {
+        "split_num": 9,
+        "test_period": "2022-02-04 to 2022-05-04",
+        "test_accuracy": 0.2459016393442623,
+        "test_f1_score": 0.22869904006216604,
+        "val_test_gap": 0.2064793130366901
+      },
+      {
+        "split_num": 10,
+        "test_period": "2022-08-04 to 2022-11-04",
+        "test_accuracy": 0.3511450381679389,
+        "test_f1_score": 0.34942983696164354,
+        "val_test_gap": -0.08130376832666908
+      },
+      {
+        "split_num": 11,
+        "test_period": "2023-02-04 to 2023-05-04",
+        "test_accuracy": 0.5619834710743802,
+        "test_f1_score": 0.596364868974371,
+        "val_test_gap": -0.16515807424898338
+      },
+      {
+        "split_num": 12,
+        "test_period": "2023-08-04 to 2023-11-04",
+        "test_accuracy": 0.366412213740458,
+        "test_f1_score": 0.41536938238486426,
+        "val_test_gap": 0.18120683387858966
+      },
+      {
+        "split_num": 13,
+        "test_period": "2024-02-04 to 2024-05-04",
+        "test_accuracy": 0.624,
+        "test_f1_score": 0.6467554138434968,
+        "val_test_gap": -0.07115447154471544
+      },
+      {
+        "split_num": 14,
+        "test_period": "2024-08-04 to 2024-11-04",
+        "test_accuracy": 0.5891472868217055,
+        "test_f1_score": 0.6361539299256487,
+        "val_test_gap": 0.11246561640410102
+      },
+      {
+        "split_num": 15,
+        "test_period": "2025-02-04 to 2025-05-04",
+        "test_accuracy": 0.43902439024390244,
+        "test_f1_score": 0.40159854133103545,
+        "val_test_gap": 0.1394880064503124
+      }
+    ]
+  },
+  {
+    "timestamp": "2025-09-17T15:35:42.290134",
+    "validation_type": "walk_forward",
+    "model_type": "XGBoost",
+    "model_filename": "walkforward_xgboost_combined_atlascopco_electrolux_ericsson_plus4more_20250917_153542.pkl",
+    "datasets_used": [
+      "atlascopco",
+      "electrolux",
+      "ericsson",
+      "getinge",
+      "handelsbanken",
+      "hmb",
+      "investor"
+    ],
+    "combined_datasets": true,
+    "best_split": 15,
+    "total_splits": 15,
+    "parameters": {
+      "n_estimators": 300,
+      "max_depth": 5,
+      "learning_rate": 0.1,
+      "subsample": 0.8,
+      "colsample_bytree": 0.8,
+      "min_child_weight": 50.0,
+      "reg_alpha": 0.1,
+      "reg_lambda": 1.0,
+      "random_state": 42
+    },
+    "features": {
+      "feature_count": 22,
+      "top_10_features": [
+        "BB_middle",
+        "SMA_20",
+        "Low",
+        "SMA_10",
+        "SMA_5",
+        "Close",
+        "High",
+        "BB_upper",
+        "BB_lower",
+        "Open"
+      ]
+    },
+    "summary_metrics": {
+      "mean_train_accuracy": 0.726714842109206,
+      "mean_val_accuracy": 0.35715536042550294,
+      "mean_test_accuracy": 0.34178095833304717,
+      "std_test_accuracy": 0.04101877163727233,
+      "mean_train_f1": 0.7277375645994545,
+      "mean_val_f1": 0.36310903441953196,
+      "mean_test_f1": 0.3468377251794463,
+      "std_test_f1": 0.040101483332956614
+    },
+    "split_details": [
+      {
+        "split_num": 1,
+        "test_period": "2018-02-05 to 2018-05-05",
+        "test_accuracy": 0.3433179723502304,
+        "test_f1_score": 0.34374665361476103,
+        "val_test_gap": 0.016129032258064502
+      },
+      {
+        "split_num": 2,
+        "test_period": "2018-08-05 to 2018-11-05",
+        "test_accuracy": 0.3252747252747253,
+        "test_f1_score": 0.3339484993885773,
+        "val_test_gap": 0.029635989010989017
+      },
+      {
+        "split_num": 3,
+        "test_period": "2019-02-05 to 2019-05-05",
+        "test_accuracy": 0.3185011709601874,
+        "test_f1_score": 0.33906757201782667,
+        "val_test_gap": 0.04918032786885246
+      },
+      {
+        "split_num": 4,
+        "test_period": "2019-08-05 to 2019-11-05",
+        "test_accuracy": 0.2835164835164835,
+        "test_f1_score": 0.30385501239756474,
+        "val_test_gap": 0.08553113553113556
+      },
+      {
+        "split_num": 5,
+        "test_period": "2020-02-05 to 2020-05-05",
+        "test_accuracy": 0.44028103044496486,
+        "test_f1_score": 0.43593688839820877,
+        "val_test_gap": -0.097423887587822
+      },
+      {
+        "split_num": 6,
+        "test_period": "2020-08-05 to 2020-11-05",
+        "test_accuracy": 0.36147186147186144,
+        "test_f1_score": 0.3685761588139974,
+        "val_test_gap": 0.020224567099567103
+      },
+      {
+        "split_num": 7,
+        "test_period": "2021-02-05 to 2021-05-05",
+        "test_accuracy": 0.3114754098360656,
+        "test_f1_score": 0.3308465829827048,
+        "val_test_gap": 0.04918032786885246
+      },
+      {
+        "split_num": 8,
+        "test_period": "2021-08-05 to 2021-11-05",
+        "test_accuracy": 0.3917748917748918,
+        "test_f1_score": 0.39389489480012047,
+        "val_test_gap": -0.054721320346320323
+      },
+      {
+        "split_num": 9,
+        "test_period": "2022-02-05 to 2022-05-05",
+        "test_accuracy": 0.33489461358313816,
+        "test_f1_score": 0.3312842450517834,
+        "val_test_gap": -0.01516672242667555
+      },
+      {
+        "split_num": 10,
+        "test_period": "2022-08-05 to 2022-11-05",
+        "test_accuracy": 0.3593073593073593,
+        "test_f1_score": 0.3555359905931361,
+        "val_test_gap": -0.003298289012574729
+      },
+      {
+        "split_num": 11,
+        "test_period": "2023-02-05 to 2023-05-05",
+        "test_accuracy": 0.2693208430913349,
+        "test_f1_score": 0.2578495551114495,
+        "val_test_gap": 0.07535035872272405
+      },
+      {
+        "split_num": 12,
+        "test_period": "2023-08-05 to 2023-11-05",
+        "test_accuracy": 0.3626373626373626,
+        "test_f1_score": 0.3605492429157994,
+        "val_test_gap": -0.008895866038723166
+      },
+      {
+        "split_num": 13,
+        "test_period": "2024-02-05 to 2024-05-05",
+        "test_accuracy": 0.3686635944700461,
+        "test_f1_score": 0.38802290380517873,
+        "val_test_gap": -0.004608294930875612
+      },
+      {
+        "split_num": 14,
+        "test_period": "2024-08-05 to 2024-11-05",
+        "test_accuracy": 0.341991341991342,
+        "test_f1_score": 0.3447378603547636,
+        "val_test_gap": -0.0009775171065493637
+      },
+      {
+        "split_num": 15,
+        "test_period": "2025-02-05 to 2025-05-05",
+        "test_accuracy": 0.3142857142857143,
+        "test_f1_score": 0.31471381744582266,
+        "val_test_gap": 0.09047619047619049
+      }
+    ]
+  },
+  {
+    "timestamp": "2025-09-17T19:50:28.474244",
+    "validation_type": "walk_forward",
+    "model_type": "XGBoost",
+    "model_filename": "walkforward_xgboost_combined_atlascopco_electrolux_ericsson_plus10more_20250917_195028.pkl",
+    "datasets_used": [
+      "atlascopco",
+      "electrolux",
+      "ericsson",
+      "getinge",
+      "handelsbanken",
+      "hmb",
+      "investor",
+      "nordea",
+      "sandvik",
+      "seb",
+      "skf",
+      "swedbank",
+      "telia"
+    ],
+    "combined_datasets": true,
+    "best_split": 2,
+    "total_splits": 15,
+    "parameters": {
+      "n_estimators": 300,
+      "max_depth": 5,
+      "learning_rate": 0.1,
+      "subsample": 0.8,
+      "colsample_bytree": 0.8,
+      "min_child_weight": 50.0,
+      "reg_alpha": 0.1,
+      "reg_lambda": 1.0,
+      "random_state": 42
+    },
+    "features": {
+      "feature_count": 22,
+      "top_10_features": [
+        "BB_middle",
+        "SMA_5",
+        "BB_upper",
+        "SMA_10",
+        "Low",
+        "Close",
+        "SMA_20",
+        "BB_width",
+        "High",
+        "Open"
+      ]
+    },
+    "summary_metrics": {
+      "mean_train_accuracy": 0.6717840232627172,
+      "mean_val_accuracy": 0.36073357290074637,
+      "mean_test_accuracy": 0.35239411946038474,
+      "std_test_accuracy": 0.03736052357754725,
+      "mean_train_f1": 0.6739426445524365,
+      "mean_val_f1": 0.36925916478852117,
+      "mean_test_f1": 0.35768114339159157,
+      "std_test_f1": 0.03452132700447155
+    },
+    "split_details": [
+      {
+        "split_num": 1,
+        "test_period": "2018-02-05 to 2018-05-05",
+        "test_accuracy": 0.315136476426799,
+        "test_f1_score": 0.32074112496795965,
+        "val_test_gap": 0.04218362282878413
+      },
+      {
+        "split_num": 2,
+        "test_period": "2018-08-05 to 2018-11-05",
+        "test_accuracy": 0.38224852071005916,
+        "test_f1_score": 0.3902523332920888,
+        "val_test_gap": 0.04683801775147928
+      },
+      {
+        "split_num": 3,
+        "test_period": "2019-02-05 to 2019-05-05",
+        "test_accuracy": 0.3379571248423707,
+        "test_f1_score": 0.35287960914568345,
+        "val_test_gap": -0.0012610340479192739
+      },
+      {
+        "split_num": 4,
+        "test_period": "2019-08-05 to 2019-11-05",
+        "test_accuracy": 0.28875739644970416,
+        "test_f1_score": 0.3021389228604246,
+        "val_test_gap": 0.07149901380670609
+      },
+      {
+        "split_num": 5,
+        "test_period": "2020-02-05 to 2020-05-05",
+        "test_accuracy": 0.4312736443883985,
+        "test_f1_score": 0.41635065410761757,
+        "val_test_gap": -0.04794031105506513
+      },
+      {
+        "split_num": 6,
+        "test_period": "2020-08-05 to 2020-11-05",
+        "test_accuracy": 0.3717948717948718,
+        "test_f1_score": 0.3791291893944315,
+        "val_test_gap": -0.026842948717948734
+      },
+      {
+        "split_num": 7,
+        "test_period": "2021-02-05 to 2021-05-05",
+        "test_accuracy": 0.29129886506935687,
+        "test_f1_score": 0.2969339598798655,
+        "val_test_gap": 0.07187894073139978
+      },
+      {
+        "split_num": 8,
+        "test_period": "2021-08-05 to 2021-11-05",
+        "test_accuracy": 0.4020979020979021,
+        "test_f1_score": 0.40929738482186034,
+        "val_test_gap": -0.009069055944055937
+      },
+      {
+        "split_num": 9,
+        "test_period": "2022-02-05 to 2022-05-05",
+        "test_accuracy": 0.35435056746532156,
+        "test_f1_score": 0.3494825564577687,
+        "val_test_gap": -0.027122240236994333
+      },
+      {
+        "split_num": 10,
+        "test_period": "2022-08-05 to 2022-11-05",
+        "test_accuracy": 0.3776223776223776,
+        "test_f1_score": 0.37436771357451065,
+        "val_test_gap": -0.012543012543012544
+      },
+      {
+        "split_num": 11,
+        "test_period": "2023-02-05 to 2023-05-05",
+        "test_accuracy": 0.36065573770491804,
+        "test_f1_score": 0.35087285288028114,
+        "val_test_gap": -0.022438399487579808
+      },
+      {
+        "split_num": 12,
+        "test_period": "2023-08-05 to 2023-11-05",
+        "test_accuracy": 0.3455621301775148,
+        "test_f1_score": 0.3531139510411826,
+        "val_test_gap": 0.0048652202498356
+      },
+      {
+        "split_num": 13,
+        "test_period": "2024-02-05 to 2024-05-05",
+        "test_accuracy": 0.34615384615384615,
+        "test_f1_score": 0.3681475053331043,
+        "val_test_gap": -0.016129032258064502
+      },
+      {
+        "split_num": 14,
+        "test_period": "2024-08-05 to 2024-11-05",
+        "test_accuracy": 0.35664335664335667,
+        "test_f1_score": 0.37784193041830383,
+        "val_test_gap": -0.01421159485675616
+      },
+      {
+        "split_num": 15,
+        "test_period": "2025-02-05 to 2025-05-05",
+        "test_accuracy": 0.3243589743589744,
+        "test_f1_score": 0.3236674626987908,
+        "val_test_gap": 0.06538461538461537
+      }
+    ]
+  },
+  {
+    "timestamp": "2025-09-17T19:54:21.268534",
+    "validation_type": "walk_forward",
+    "model_type": "XGBoost",
+    "model_filename": "walkforward_xgboost_combined_atlascopco_electrolux_ericsson_plus11more_20250917_195421.pkl",
+    "datasets_used": [
+      "atlascopco",
+      "electrolux",
+      "ericsson",
+      "getinge",
+      "handelsbanken",
+      "hmb",
+      "investor",
+      "nordea",
+      "sandvik",
+      "seb",
+      "skf",
+      "swedbank",
+      "telia",
+      "OMXS30"
+    ],
+    "combined_datasets": true,
+    "best_split": 15,
+    "total_splits": 15,
+    "parameters": {
+      "n_estimators": 300,
+      "max_depth": 5,
+      "learning_rate": 0.1,
+      "subsample": 0.8,
+      "colsample_bytree": 0.8,
+      "min_child_weight": 50.0,
+      "reg_alpha": 0.1,
+      "reg_lambda": 1.0,
+      "random_state": 42
+    },
+    "features": {
+      "feature_count": 22,
+      "top_10_features": [
+        "Close",
+        "BB_middle",
+        "SMA_5",
+        "BB_upper",
+        "SMA_10",
+        "Low",
+        "SMA_20",
+        "BB_lower",
+        "High",
+        "Open"
+      ]
+    },
+    "summary_metrics": {
+      "mean_train_accuracy": 0.660914912621923,
+      "mean_val_accuracy": 0.375025005766305,
+      "mean_test_accuracy": 0.3581440570513256,
+      "std_test_accuracy": 0.03093373079810918,
+      "mean_train_f1": 0.6638219652333446,
+      "mean_val_f1": 0.38577033867413485,
+      "mean_test_f1": 0.3655519869030448,
+      "std_test_f1": 0.027186769892714745
+    },
+    "split_details": [
+      {
+        "split_num": 1,
+        "test_period": "2018-02-04 to 2018-05-04",
+        "test_accuracy": 0.34543325526932084,
+        "test_f1_score": 0.3516459782754644,
+        "val_test_gap": 0.026686560398881953
+      },
+      {
+        "split_num": 2,
+        "test_period": "2018-08-04 to 2018-11-04",
+        "test_accuracy": 0.3824175824175824,
+        "test_f1_score": 0.38944774936118776,
+        "val_test_gap": 0.04599651449871717
+      },
+      {
+        "split_num": 3,
+        "test_period": "2019-02-04 to 2019-05-04",
+        "test_accuracy": 0.35023041474654376,
+        "test_f1_score": 0.3664445787988451,
+        "val_test_gap": 0.0021505376344086446
+      },
+      {
+        "split_num": 4,
+        "test_period": "2019-08-04 to 2019-11-04",
+        "test_accuracy": 0.3002232142857143,
+        "test_f1_score": 0.3154612220247416,
+        "val_test_gap": 0.07120535714285714
+      },
+      {
+        "split_num": 5,
+        "test_period": "2020-02-04 to 2020-05-04",
+        "test_accuracy": 0.4063231850117096,
+        "test_f1_score": 0.38487584800271396,
+        "val_test_gap": -0.03727556596409054
+      },
+      {
+        "split_num": 6,
+        "test_period": "2020-08-04 to 2020-11-04",
+        "test_accuracy": 0.38203463203463206,
+        "test_f1_score": 0.3928753710551956,
+        "val_test_gap": -0.02823998917748921
+      },
+      {
+        "split_num": 7,
+        "test_period": "2021-02-04 to 2021-05-04",
+        "test_accuracy": 0.33528722157092616,
+        "test_f1_score": 0.34604927163426,
+        "val_test_gap": 0.061668281941954395
+      },
+      {
+        "split_num": 8,
+        "test_period": "2021-08-04 to 2021-11-04",
+        "test_accuracy": 0.4264069264069264,
+        "test_f1_score": 0.4371115803971581,
+        "val_test_gap": -0.03466585497835495
+      },
+      {
+        "split_num": 9,
+        "test_period": "2022-02-04 to 2022-05-04",
+        "test_accuracy": 0.35362997658079626,
+        "test_f1_score": 0.34746305896101587,
+        "val_test_gap": -0.006691201070592179
+      },
+      {
+        "split_num": 10,
+        "test_period": "2022-08-04 to 2022-11-04",
+        "test_accuracy": 0.3647186147186147,
+        "test_f1_score": 0.3602483367334475,
+        "val_test_gap": -0.008709544423830151
+      },
+      {
+        "split_num": 11,
+        "test_period": "2023-02-04 to 2023-05-04",
+        "test_accuracy": 0.36428571428571427,
+        "test_f1_score": 0.3598340457668189,
+        "val_test_gap": 0.01517857142857143
+      },
+      {
+        "split_num": 12,
+        "test_period": "2023-08-04 to 2023-11-04",
+        "test_accuracy": 0.3560606060606061,
+        "test_f1_score": 0.365493268825638,
+        "val_test_gap": -0.004586683158111726
+      },
+      {
+        "split_num": 13,
+        "test_period": "2024-02-04 to 2024-05-04",
+        "test_accuracy": 0.3421658986175115,
+        "test_f1_score": 0.37354965542582236,
+        "val_test_gap": 0.018433179723502335
+      },
+      {
+        "split_num": 14,
+        "test_period": "2024-08-04 to 2024-11-04",
+        "test_accuracy": 0.31868131868131866,
+        "test_f1_score": 0.3479808178703884,
+        "val_test_gap": 0.045373980857851826
+      },
+      {
+        "split_num": 15,
+        "test_period": "2025-02-04 to 2025-05-04",
+        "test_accuracy": 0.3442622950819672,
+        "test_f1_score": 0.3447990204129745,
+        "val_test_gap": 0.08669008587041377
+      }
+    ]
+  }
+]

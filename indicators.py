@@ -128,8 +128,20 @@ def main():
     data_dir = "data"
     
     files_to_process = [
-        ("OMXS30_10year_data.csv", "OMXS30.csv"),
-        ("SP500_10year_data.csv", "SP500.csv")
+        ("atlascopco_rawdata.csv", "atlascopco_rawdata.csv"),
+        ("electrolux_rawdata.csv", "electrolux_rawdata.csv"),
+        ("ericsson_rawdata.csv", "ericsson_rawdata.csv"),
+        ("getinge_rawdata.csv", "getinge_rawdata.csv"),
+        ("handelsbanken_rawdata.csv", "handelsbanken_rawdata.csv"),
+        ("hmb_rawdata.csv", "hmb_rawdata.csv"),
+        ("investor_rawdata.csv", "investor_rawdata.csv"),
+        ("nordea_rawdata.csv", "nordea_rawdata.csv"),
+        ("sandvik_rawdata.csv", "sandvik_rawdata.csv"),
+        ("seb_rawdata.csv", "seb_rawdata.csv"),
+        ("skf_rawdata.csv", "skf_rawdata.csv"),
+        ("swedbank_rawdata.csv", "swedbank_rawdata.csv"),
+        ("telia_rawdata.csv", "telia_rawdata.csv"),
+        ("volvo_rawdata.csv", "volvo_rawdata.csv")
     ]
     
     # Ensure data directory exists

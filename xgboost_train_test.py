@@ -71,10 +71,13 @@ def prepare_features(df, selected_features=None, drop_columns=None):
     Returns:
     tuple: (X, y) where X is features and y is target
     """
+    
     if drop_columns is None:
+        # Vi tar bort Date och Target från features eftersom
+        # datum inte är en feature och Target är målvariabeln
         drop_columns = ['Date', 'Target']
     
-    # Separate features and target
+    # Särskilj features och målvariabel 
     if selected_features is not None:
         X = df[selected_features]
     else:
@@ -82,7 +85,7 @@ def prepare_features(df, selected_features=None, drop_columns=None):
     
     y = df['Target']
     
-    # Remove rows with NaN values (typically first few rows due to technical indicators)
+    #This is probably not needed since indicators.py already cleans NaNs
     valid_mask = ~(X.isna().any(axis=1) | y.isna())
     X = X[valid_mask]
     y = y[valid_mask]
@@ -90,7 +93,6 @@ def prepare_features(df, selected_features=None, drop_columns=None):
     print(f"Features prepared: {X.shape[1]} features, {X.shape[0]} samples")
     
     return X, y
-
 
 def compute_class_weights(y_train):
     """
@@ -132,7 +134,7 @@ def train_xgboost(X_train, y_train, class_weights=None, **xgb_params):
     """
     # Default parameters for XGBoost
     default_params = {
-        'n_estimators': 200,
+        'n_estimators': 300,
         'max_depth': 5,
         'learning_rate': 0.1,
         'subsample': 0.8,

@@ -9,8 +9,25 @@ def gather_stock_data():
     """
     # Define the stock symbols
     symbols = {
-        'OMXS30': '^OMX',
-        'SP500': '^GSPC'
+        # 'OMXS30': '^OMX',
+        # 'SP500': '^GSPC',
+        # Big tech companies
+        # 'AAPL': 'AAPL',
+        # 'MSFT': 'MSFT',
+        "volvo": "VOLV-B.ST",
+        "investor": "INVE-A.ST",
+        "atlascopco": "ATCO-A.ST",
+        "ericsson": "ERIC-B.ST",
+        "hmb": "HM-B.ST",
+        "swedbank": "SWED-A.ST",
+        "handelsbanken": "SHB-A.ST",
+        "seb": "SEB-A.ST",
+        "nordea": "NDA-SE.ST",
+        "sandvik": "SAND.ST",
+        "skf": "SKF-B.ST",
+        "electrolux": "ELUX-B.ST",
+        "telia": "TELIA.ST",
+        "getinge": "GETI-B.ST",
     }
     
     # Calculate date range (10 years from today)
@@ -20,7 +37,7 @@ def gather_stock_data():
     print(f"Gathering data from {start_date.strftime('%Y-%m-%d')} to {end_date.strftime('%Y-%m-%d')}")
     
     # Create data directory if it doesn't exist
-    data_dir = "data"
+    data_dir = "rawdata"
     if not os.path.exists(data_dir):
         os.makedirs(data_dir)
     
@@ -48,7 +65,7 @@ def gather_stock_data():
             data['Date'] = data['Date'].dt.strftime('%Y-%m-%d')
             
             # Save to CSV file
-            filename = f"{data_dir}/{name}_10year_data.csv"
+            filename = f"{data_dir}/{name}_rawdata.csv"
             data.to_csv(filename, index=False)
             
             print(f"Successfully saved {len(data)} records to {filename}")

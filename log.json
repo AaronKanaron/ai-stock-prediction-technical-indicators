@@ -2432,5 +2432,565 @@
         "f1_score": 0.5854
       }
     }
+  },
+  {
+    "timestamp": "2025-09-16T11:28:48.494324",
+    "model_type": "XGBoost",
+    "model_filename": "xgboost_model_20250916_112848.pkl",
+    "datasets_used": [
+      "OMXS30"
+    ],
+    "parameters": {
+      "n_estimators": 200,
+      "max_depth": 5,
+      "learning_rate": 0.1,
+      "subsample": 0.8,
+      "colsample_bytree": 0.8,
+      "colsample_bylevel": 1.0,
+      "min_child_weight": 50,
+      "reg_alpha": 0.1,
+      "reg_lambda": 1.0,
+      "random_state": 42,
+      "eval_metric": "mlogloss",
+      "objective": "multi:softprob",
+      "num_class": 3
+    },
+    "features": {
+      "selected_features": [
+        "Open",
+        "High",
+        "Low",
+        "Close",
+        "Volume",
+        "SMA_5",
+        "SMA_10",
+        "SMA_20",
+        "RSI_14",
+        "MACD",
+        "MACD_signal",
+        "MACD_histogram",
+        "BB_upper",
+        "BB_middle",
+        "BB_lower",
+        "BB_width",
+        "Rolling_Std_20",
+        "Return_1d",
+        "Return_5d_lag",
+        "Return_10d_lag",
+        "SMA_ratio",
+        "Price_change_20d"
+      ],
+      "feature_count": 22
+    },
+    "metrics": {
+      "training_set": {
+        "accuracy": 0.8063,
+        "precision": 0.8475,
+        "recall": 0.8063,
+        "f1_score": 0.8139
+      },
+      "validation_set": {
+        "accuracy": 0.4656,
+        "precision": 0.4833,
+        "recall": 0.4656,
+        "f1_score": 0.4705
+      },
+      "test_set": {
+        "accuracy": 0.5891,
+        "precision": 0.5863,
+        "recall": 0.5891,
+        "f1_score": 0.5854
+      }
+    }
+  },
+  {
+    "timestamp": "2025-09-16T13:19:28.628580",
+    "model_type": "XGBoost",
+    "model_filename": "xgboost_model_20250916_131928.pkl",
+    "datasets_used": [
+      "OMXS30"
+    ],
+    "parameters": {
+      "n_estimators": 300,
+      "max_depth": 5,
+      "learning_rate": 0.1,
+      "subsample": 0.8,
+      "colsample_bytree": 0.8,
+      "colsample_bylevel": 1.0,
+      "min_child_weight": 50,
+      "reg_alpha": 0.1,
+      "reg_lambda": 1.0,
+      "random_state": 42,
+      "eval_metric": "mlogloss",
+      "objective": "multi:softprob",
+      "num_class": 3
+    },
+    "features": {
+      "selected_features": [
+        "Open",
+        "High",
+        "Low",
+        "Close",
+        "Volume",
+        "SMA_5",
+        "SMA_10",
+        "SMA_20",
+        "RSI_14",
+        "MACD",
+        "MACD_signal",
+        "MACD_histogram",
+        "BB_upper",
+        "BB_middle",
+        "BB_lower",
+        "BB_width",
+        "Rolling_Std_20",
+        "Return_1d",
+        "Return_5d_lag",
+        "Return_10d_lag",
+        "SMA_ratio",
+        "Price_change_20d"
+      ],
+      "feature_count": 22
+    },
+    "metrics": {
+      "training_set": {
+        "accuracy": 0.8394,
+        "precision": 0.8754,
+        "recall": 0.8394,
+        "f1_score": 0.8457
+      },
+      "validation_set": {
+        "accuracy": 0.4798,
+        "precision": 0.4859,
+        "recall": 0.4798,
+        "f1_score": 0.4816
+      },
+      "test_set": {
+        "accuracy": 0.5951,
+        "precision": 0.5803,
+        "recall": 0.5951,
+        "f1_score": 0.5859
+      }
+    }
+  },
+  {
+    "timestamp": "2025-09-16T13:25:16.036637",
+    "model_type": "XGBoost",
+    "model_filename": "xgboost_model_20250916_132516.pkl",
+    "datasets_used": [
+      "OMXS30"
+    ],
+    "parameters": {
+      "n_estimators": 300,
+      "max_depth": 5,
+      "learning_rate": 0.1,
+      "subsample": 0.8,
+      "colsample_bytree": 0.8,
+      "colsample_bylevel": 1.0,
+      "min_child_weight": 50,
+      "reg_alpha": 0.1,
+      "reg_lambda": 1.0,
+      "random_state": 42,
+      "eval_metric": "mlogloss",
+      "objective": "multi:softprob",
+      "num_class": 3
+    },
+    "features": {
+      "selected_features": [
+        "Open",
+        "High",
+        "Low",
+        "Close",
+        "Volume",
+        "SMA_5",
+        "SMA_10",
+        "SMA_20",
+        "RSI_14",
+        "MACD",
+        "MACD_signal",
+        "MACD_histogram",
+        "BB_upper",
+        "BB_middle",
+        "BB_lower",
+        "BB_width",
+        "Rolling_Std_20",
+        "Return_1d",
+        "Return_5d_lag",
+        "Return_10d_lag",
+        "SMA_ratio",
+        "Price_change_20d"
+      ],
+      "feature_count": 22
+    },
+    "metrics": {
+      "training_set": {
+        "accuracy": 0.8394,
+        "precision": 0.8754,
+        "recall": 0.8394,
+        "f1_score": 0.8457
+      },
+      "validation_set": {
+        "accuracy": 0.4798,
+        "precision": 0.4859,
+        "recall": 0.4798,
+        "f1_score": 0.4816
+      },
+      "test_set": {
+        "accuracy": 0.5951,
+        "precision": 0.5803,
+        "recall": 0.5951,
+        "f1_score": 0.5859
+      }
+    }
+  },
+  {
+    "timestamp": "2025-09-16T14:07:39.929879",
+    "model_type": "XGBoost",
+    "model_filename": "xgboost_model_20250916_140739.pkl",
+    "datasets_used": [
+      "OMXS30"
+    ],
+    "parameters": {
+      "n_estimators": 300,
+      "max_depth": 5,
+      "learning_rate": 0.05,
+      "subsample": 0.8,
+      "colsample_bytree": 0.8,
+      "colsample_bylevel": 1.0,
+      "min_child_weight": 50,
+      "reg_alpha": 0.1,
+      "reg_lambda": 1.0,
+      "random_state": 42,
+      "eval_metric": "mlogloss",
+      "objective": "multi:softprob",
+      "num_class": 3
+    },
+    "features": {
+      "selected_features": [
+        "Open",
+        "High",
+        "Low",
+        "Close",
+        "Volume",
+        "SMA_5",
+        "SMA_10",
+        "SMA_20",
+        "RSI_14",
+        "MACD",
+        "MACD_signal",
+        "MACD_histogram",
+        "BB_upper",
+        "BB_middle",
+        "BB_lower",
+        "BB_width",
+        "Rolling_Std_20",
+        "Return_1d",
+        "Return_5d_lag",
+        "Return_10d_lag",
+        "SMA_ratio",
+        "Price_change_20d"
+      ],
+      "feature_count": 22
+    },
+    "metrics": {
+      "training_set": {
+        "accuracy": 0.7807,
+        "precision": 0.831,
+        "recall": 0.7807,
+        "f1_score": 0.79
+      },
+      "validation_set": {
+        "accuracy": 0.4696,
+        "precision": 0.4922,
+        "recall": 0.4696,
+        "f1_score": 0.4756
+      },
+      "test_set": {
+        "accuracy": 0.5931,
+        "precision": 0.594,
+        "recall": 0.5931,
+        "f1_score": 0.5912
+      }
+    }
+  },
+  {
+    "timestamp": "2025-09-16T14:07:55.595393",
+    "model_type": "XGBoost",
+    "model_filename": "xgboost_model_20250916_140755.pkl",
+    "datasets_used": [
+      "OMXS30"
+    ],
+    "parameters": {
+      "n_estimators": 300,
+      "max_depth": 5,
+      "learning_rate": 0.1,
+      "subsample": 0.8,
+      "colsample_bytree": 0.8,
+      "colsample_bylevel": 1.0,
+      "min_child_weight": 50,
+      "reg_alpha": 0.1,
+      "reg_lambda": 1.0,
+      "random_state": 42,
+      "eval_metric": "mlogloss",
+      "objective": "multi:softprob",
+      "num_class": 3
+    },
+    "features": {
+      "selected_features": [
+        "Open",
+        "High",
+        "Low",
+        "Close",
+        "Volume",
+        "SMA_5",
+        "SMA_10",
+        "SMA_20",
+        "RSI_14",
+        "MACD",
+        "MACD_signal",
+        "MACD_histogram",
+        "BB_upper",
+        "BB_middle",
+        "BB_lower",
+        "BB_width",
+        "Rolling_Std_20",
+        "Return_1d",
+        "Return_5d_lag",
+        "Return_10d_lag",
+        "SMA_ratio",
+        "Price_change_20d"
+      ],
+      "feature_count": 22
+    },
+    "metrics": {
+      "training_set": {
+        "accuracy": 0.8394,
+        "precision": 0.8754,
+        "recall": 0.8394,
+        "f1_score": 0.8457
+      },
+      "validation_set": {
+        "accuracy": 0.4798,
+        "precision": 0.4859,
+        "recall": 0.4798,
+        "f1_score": 0.4816
+      },
+      "test_set": {
+        "accuracy": 0.5951,
+        "precision": 0.5803,
+        "recall": 0.5951,
+        "f1_score": 0.5859
+      }
+    }
+  },
+  {
+    "timestamp": "2025-09-16T14:08:59.327260",
+    "model_type": "XGBoost",
+    "model_filename": "xgboost_model_20250916_140859.pkl",
+    "datasets_used": [
+      "OMXS30"
+    ],
+    "parameters": {
+      "n_estimators": 300,
+      "max_depth": 5,
+      "learning_rate": 0.1,
+      "subsample": 0.8,
+      "colsample_bytree": 0.2,
+      "colsample_bylevel": 1.0,
+      "min_child_weight": 50,
+      "reg_alpha": 0.1,
+      "reg_lambda": 1.0,
+      "random_state": 42,
+      "eval_metric": "mlogloss",
+      "objective": "multi:softprob",
+      "num_class": 3
+    },
+    "features": {
+      "selected_features": [
+        "Open",
+        "High",
+        "Low",
+        "Close",
+        "Volume",
+        "SMA_5",
+        "SMA_10",
+        "SMA_20",
+        "RSI_14",
+        "MACD",
+        "MACD_signal",
+        "MACD_histogram",
+        "BB_upper",
+        "BB_middle",
+        "BB_lower",
+        "BB_width",
+        "Rolling_Std_20",
+        "Return_1d",
+        "Return_5d_lag",
+        "Return_10d_lag",
+        "SMA_ratio",
+        "Price_change_20d"
+      ],
+      "feature_count": 22
+    },
+    "metrics": {
+      "training_set": {
+        "accuracy": 0.8111,
+        "precision": 0.8519,
+        "recall": 0.8111,
+        "f1_score": 0.8183
+      },
+      "validation_set": {
+        "accuracy": 0.4858,
+        "precision": 0.4956,
+        "recall": 0.4858,
+        "f1_score": 0.4852
+      },
+      "test_set": {
+        "accuracy": 0.5992,
+        "precision": 0.6015,
+        "recall": 0.5992,
+        "f1_score": 0.5955
+      }
+    }
+  },
+  {
+    "timestamp": "2025-09-16T14:09:15.089832",
+    "model_type": "XGBoost",
+    "model_filename": "xgboost_model_20250916_140915.pkl",
+    "datasets_used": [
+      "OMXS30"
+    ],
+    "parameters": {
+      "n_estimators": 300,
+      "max_depth": 5,
+      "learning_rate": 0.1,
+      "subsample": 0.8,
+      "colsample_bytree": 0.8,
+      "colsample_bylevel": 1.0,
+      "min_child_weight": 50,
+      "reg_alpha": 0.1,
+      "reg_lambda": 1.0,
+      "random_state": 42,
+      "eval_metric": "mlogloss",
+      "objective": "multi:softprob",
+      "num_class": 3
+    },
+    "features": {
+      "selected_features": [
+        "Open",
+        "High",
+        "Low",
+        "Close",
+        "Volume",
+        "SMA_5",
+        "SMA_10",
+        "SMA_20",
+        "RSI_14",
+        "MACD",
+        "MACD_signal",
+        "MACD_histogram",
+        "BB_upper",
+        "BB_middle",
+        "BB_lower",
+        "BB_width",
+        "Rolling_Std_20",
+        "Return_1d",
+        "Return_5d_lag",
+        "Return_10d_lag",
+        "SMA_ratio",
+        "Price_change_20d"
+      ],
+      "feature_count": 22
+    },
+    "metrics": {
+      "training_set": {
+        "accuracy": 0.8394,
+        "precision": 0.8754,
+        "recall": 0.8394,
+        "f1_score": 0.8457
+      },
+      "validation_set": {
+        "accuracy": 0.4798,
+        "precision": 0.4859,
+        "recall": 0.4798,
+        "f1_score": 0.4816
+      },
+      "test_set": {
+        "accuracy": 0.5951,
+        "precision": 0.5803,
+        "recall": 0.5951,
+        "f1_score": 0.5859
+      }
+    }
+  },
+  {
+    "timestamp": "2025-09-16T15:12:18.232703",
+    "model_type": "XGBoost",
+    "model_filename": "xgboost_model_20250916_151218.pkl",
+    "datasets_used": [
+      "OMXS30"
+    ],
+    "parameters": {
+      "n_estimators": 300,
+      "max_depth": 5,
+      "learning_rate": 0.1,
+      "subsample": 0.8,
+      "colsample_bytree": 0.8,
+      "colsample_bylevel": 1.0,
+      "min_child_weight": 50,
+      "reg_alpha": 0.1,
+      "reg_lambda": 1.0,
+      "random_state": 42,
+      "eval_metric": "mlogloss",
+      "objective": "multi:softprob",
+      "num_class": 3
+    },
+    "features": {
+      "selected_features": [
+        "Open",
+        "High",
+        "Low",
+        "Close",
+        "Volume",
+        "SMA_5",
+        "SMA_10",
+        "SMA_20",
+        "RSI_14",
+        "MACD",
+        "MACD_signal",
+        "MACD_histogram",
+        "BB_upper",
+        "BB_middle",
+        "BB_lower",
+        "BB_width",
+        "Rolling_Std_20",
+        "Return_1d",
+        "Return_5d_lag",
+        "Return_10d_lag",
+        "SMA_ratio",
+        "Price_change_20d"
+      ],
+      "feature_count": 22
+    },
+    "metrics": {
+      "training_set": {
+        "accuracy": 0.8394,
+        "precision": 0.8754,
+        "recall": 0.8394,
+        "f1_score": 0.8457
+      },
+      "validation_set": {
+        "accuracy": 0.4798,
+        "precision": 0.4859,
+        "recall": 0.4798,
+        "f1_score": 0.4816
+      },
+      "test_set": {
+        "accuracy": 0.5951,
+        "precision": 0.5803,
+        "recall": 0.5951,
+        "f1_score": 0.5859
+      }
+    }
   }
 ]
