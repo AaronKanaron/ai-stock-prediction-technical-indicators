@@ -410,10 +410,21 @@ class PortfolioVisualizer:
         print(f"  Duration: {years:.1f} years")
         print(f"  Benchmark Stock: {self.benchmark_stock}\n")
         
-        # print(f"\n{'Strategy':<20} {'Final Value':<15} {'Total Return':<15} {'Annual Return':<15}")
-        # print("-" * 65)
-        # print(f"{'Benchmark':<20} {benchmark_metrics['benchmark']['final_value']:<14.2f} {benchmark_metrics['benchmark']['total_return']:<14.2f}% {benchmark_metrics['benchmark']['annual_return']:<14.2f}%")
-        # print(f"{'Model Strategy':<20} {model_final_value:<14.2f} {model_total_return:<14.2f}% {model_annual_return:<14.2f}%")
+        signals = self.model_portfolio_data['Signal'].dropna()
+        signal_changes = (signals != signals.shift()).sum()
+        
+        # Trading activity analysis
+        print(f"\nAI Model Strategy Details:")
+        label_width = 35 
+        num_width   = 8
+
+        print(f"{'  Total trading signals generated:':<{label_width}} {len(signals):>{num_width}}")
+        print(f"{'  Signal changes (actual trades made):':<{label_width}} {signal_changes:>{num_width}}")
+        print(f"{'  Days selling (Signal=0):':<{label_width}} {(signals == 0).mean()*100:>{num_width}.1f}%")
+        print(f"{'  Days holding (Signal=1):':<{label_width}} {(signals == 1).mean()*100:>{num_width}.1f}%")
+        print(f"{'  Days buying (Signal=2):':<{label_width}} {(signals == 2).mean()*100:>{num_width}.1f}%")
+        print(f"{'  Days in market (Hold+Buy):':<{label_width}} {((signals == 1)|(signals == 2)).mean()*100:>{num_width}.1f}%")
+        print(f"{'  Days holding cash (Sell):':<{label_width}} {(signals == 0).mean()*100:>{num_width}.1f}%")
 
         table = PrettyTable(["Strategy", "Total Return", "Annual Return"])
         table.add_row([
@@ -449,18 +460,7 @@ class PortfolioVisualizer:
         #     print(f"  Benchmark final value: {benchmark_metrics['benchmark']['final_value']:.2f}")
         #     print(f"  Model final value: {model_final_value:.2f}")
         
-        # Trading activity analysis
-        signals = self.model_portfolio_data['Signal'].dropna()
-        signal_changes = (signals != signals.shift()).sum()
-        
-        print(f"\n📊 MODEL STRATEGY DETAILS:")
-        print(f"  Total trading signals generated: {len(signals)}")
-        print(f"  Signal changes (trades): {signal_changes}")
-        print(f"  Time selling (Signal=0): {(signals == 0).mean()*100:.1f}%")
-        print(f"  Time holding (Signal=1): {(signals == 1).mean()*100:.1f}%")
-        print(f"  Time buying (Signal=2): {(signals == 2).mean()*100:.1f}%")
-        print(f"  Time in market (Hold+Buy): {((signals == 1) | (signals == 2)).mean()*100:.1f}%")
-        print(f"  Time in cash (Sell): {(signals == 0).mean()*100:.1f}%")
+
         
         print("="*90)
         
@@ -486,13 +486,12 @@ def main():
     # print("📊 Comparing Benchmark vs Model Strategy Performance")
     
     # Initialize visualizer (defaults to OMXS30 as benchmark)
-    visualizer = PortfolioVisualizer()
+    visualizer = PortfolioVisualizer(benchmark_stock="seb")
     
     # Load data
     visualizer.load_data()
     
     # Calculate benchmark performance
-    print(f"\n📈 Calculating benchmark performance for {visualizer.benchmark_stock}...")
     visualizer.calculate_benchmark_performance()
     
     try:
@@ -500,9 +499,7 @@ def main():
         visualizer.simulate_model_strategy(debug=False)        
         visualizer.print_strategy_comparison()        
         visualizer.create_portfolio_visualization(save_plots=True)
-        
-        print("\n✅ Strategy comparison complete!")
-        
+                
     except Exception as e:
         print(f"\n⚠️ Could not load model or run model strategy: {str(e)}")
         print("📊 Falling back to benchmark analysis only...")

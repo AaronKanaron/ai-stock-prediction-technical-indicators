@@ -952,5 +952,48 @@
         "val_test_gap": 0.08669008587041377
       }
     ]
+  },
+  {
+    "timestamp": "2025-09-17T21:59:28.907581",
+    "validation_type": "walk_forward",
+    "model_type": "XGBoost",
+    "model_filename": "walkforward_xgboost_OMXS30_20250917_215928.pkl",
+    "datasets_used": [
+      "OMXS30"
+    ],
+    "best_split": 14,
+    "total_splits": 15,
+    "parameters": {
+      "n_estimators": 300,
+      "max_depth": 5,
+      "learning_rate": 0.1,
+      "subsample": 0.8,
+      "colsample_bytree": 0.8,
+      "min_child_weight": 50.0,
+      "reg_alpha": 0.1,
+      "reg_lambda": 1.0,
+      "random_state": 42
+    },
+    "features": {
+      "feature_count": 22,
+      "top_10_features": [
+        "BB_middle",
+        "RSI_14",
+        "SMA_20",
+        "BB_width",
+        "Low",
+        "High",
+        "Close",
+        "Rolling_Std_20",
+        "SMA_5",
+        "MACD_signal"
+      ]
+    },
+    "summary_metrics": {
+      "mean_test_accuracy": 0.42662464580927034,
+      "std_test_accuracy": 0.1427389794255684,
+      "mean_test_f1": 0.4376601458140294,
+      "std_test_f1": 0.12727178218816992
+    }
   }
 ]
