@@ -142,7 +142,7 @@ class WalkForwardValidator:
     def train_model(self, X_train, y_train, params=None):
         """Train XGBoost classifier with class balancing."""
         default_params = {
-            'n_estimators': 300,
+            'n_estimators': 400,
             'max_depth': 5,
             'learning_rate': 0.1,
             'subsample': 0.8,

@@ -415,7 +415,7 @@ class PortfolioVisualizer:
         
         # Trading activity analysis
         print(f"\nAI Model Strategy Details:")
-        label_width = 35 
+        label_width = 45 
         num_width   = 8
 
         print(f"{'  Total trading signals generated:':<{label_width}} {len(signals):>{num_width}}")
@@ -426,26 +426,29 @@ class PortfolioVisualizer:
         print(f"{'  Days in market (Hold+Buy):':<{label_width}} {((signals == 1)|(signals == 2)).mean()*100:>{num_width}.1f}%")
         print(f"{'  Days holding cash (Sell):':<{label_width}} {(signals == 0).mean()*100:>{num_width}.1f}%")
 
-        table = PrettyTable(["Strategy", "Total Return", "Annual Return"])
+        table = PrettyTable(["Strategy", "Total Return", "Annual Return", "Difference"])
         table.add_row([
             "Benchmark",
             # f"{benchmark_metrics['benchmark']['final_value']:.2f}",
             f"{benchmark_metrics['benchmark']['total_return']:.2f}%",
-            f"{benchmark_metrics['benchmark']['annual_return']:.2f}%"
+            f"{benchmark_metrics['benchmark']['annual_return']:.2f}%",
+            f"{benchmark_metrics['benchmark']['total_return'] - model_total_return:.2f}%"
         ])
         table.add_row([
             "Model Strategy",
             # f"{model_final_value:.2f}",
             f"{model_total_return:.2f}%",
-            f"{model_annual_return:.2f}%"
+            f"{model_annual_return:.2f}%",
+            f"{model_total_return - benchmark_metrics['benchmark']['total_return']:.2f}%"
         ])
         
         table.align["Strategy"] = "l"
         # table.align["Final Value"] = "r"
         table.align["Total Return"] = "r"
         table.align["Annual Return"] = "r"
-        
-        print(table)
+        table.align["Difference"] = "r"
+
+        print("\n" + str(table) + "\n")
         
         # Performance comparison
         # print(f"\n🏆 WINNER ANALYSIS:")
