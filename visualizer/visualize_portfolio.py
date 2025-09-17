@@ -5,6 +5,7 @@ from datetime import datetime
 import os
 import joblib
 from sklearn.preprocessing import StandardScaler
+from prettytable import PrettyTable
 
 class PortfolioVisualizer:
     def __init__(self, data_path="./data", benchmark_stock="OMXS30"):
@@ -55,18 +56,13 @@ class PortfolioVisualizer:
         Load the trained machine learning model (XGBoost or Random Forest)
         """
         if model_path is None:
-            # Try to find XGBoost model first, then Random Forest
+            # Try to find XGBoost model
             xgboost_files = [f for f in os.listdir("./models") if f.startswith("walkforward_xgboost") and f.endswith(".pkl")]
-            rf_files = [f for f in os.listdir("./models") if f.startswith("random_forest_model") and f.endswith(".pkl")]
             
             if xgboost_files:
                 model_path = os.path.join("./models", sorted(xgboost_files)[-1])
-                print(f"Found XGBoost model: {sorted(xgboost_files)[-1]}")
-            elif rf_files:
-                model_path = os.path.join("./models", sorted(rf_files)[-1])
-                print(f"Found Random Forest model: {sorted(rf_files)[-1]}")
             else:
-                raise FileNotFoundError("No XGBoost or Random Forest models found in models/ directory")
+                raise FileNotFoundError("No XGBoost model found in models/ directory")
         
         print(f"Loading model from: {model_path}")
         self.model = joblib.load(model_path)
@@ -404,7 +400,7 @@ class PortfolioVisualizer:
         model_annual_return = ((model_final_value / 100.0) ** (1/years) - 1) * 100
         
         print("\n" + "="*90)
-        print("STRATEGY PERFORMANCE COMPARISON")
+        print(" "*20 + "STRATEGY PERFORMANCE COMPARISON")
         print("="*90)
         
         # Period information
@@ -412,25 +408,46 @@ class PortfolioVisualizer:
         print(f"  Start Date: {start_date.strftime('%Y-%m-%d')}")
         print(f"  End Date: {end_date.strftime('%Y-%m-%d')}")
         print(f"  Duration: {years:.1f} years")
-        print(f"  Benchmark Stock: {self.benchmark_stock}")
+        print(f"  Benchmark Stock: {self.benchmark_stock}\n")
         
-        print(f"\n{'Strategy':<20} {'Final Value':<15} {'Total Return':<15} {'Annual Return':<15}")
-        print("-" * 65)
-        print(f"{'Benchmark':<20} {benchmark_metrics['benchmark']['final_value']:<14.2f} {benchmark_metrics['benchmark']['total_return']:<14.2f}% {benchmark_metrics['benchmark']['annual_return']:<14.2f}%")
-        print(f"{'Model Strategy':<20} {model_final_value:<14.2f} {model_total_return:<14.2f}% {model_annual_return:<14.2f}%")
+        # print(f"\n{'Strategy':<20} {'Final Value':<15} {'Total Return':<15} {'Annual Return':<15}")
+        # print("-" * 65)
+        # print(f"{'Benchmark':<20} {benchmark_metrics['benchmark']['final_value']:<14.2f} {benchmark_metrics['benchmark']['total_return']:<14.2f}% {benchmark_metrics['benchmark']['annual_return']:<14.2f}%")
+        # print(f"{'Model Strategy':<20} {model_final_value:<14.2f} {model_total_return:<14.2f}% {model_annual_return:<14.2f}%")
+
+        table = PrettyTable(["Strategy", "Total Return", "Annual Return"])
+        table.add_row([
+            "Benchmark",
+            # f"{benchmark_metrics['benchmark']['final_value']:.2f}",
+            f"{benchmark_metrics['benchmark']['total_return']:.2f}%",
+            f"{benchmark_metrics['benchmark']['annual_return']:.2f}%"
+        ])
+        table.add_row([
+            "Model Strategy",
+            # f"{model_final_value:.2f}",
+            f"{model_total_return:.2f}%",
+            f"{model_annual_return:.2f}%"
+        ])
+        
+        table.align["Strategy"] = "l"
+        # table.align["Final Value"] = "r"
+        table.align["Total Return"] = "r"
+        table.align["Annual Return"] = "r"
+        
+        print(table)
         
         # Performance comparison
-        print(f"\n🏆 WINNER ANALYSIS:")
-        if model_total_return > benchmark_metrics['benchmark']['total_return']:
-            outperformance = model_total_return - benchmark_metrics['benchmark']['total_return']
-            print(f"  Model Strategy WINS by {outperformance:.2f} percentage points!")
-            print(f"  Model final value: {model_final_value:.2f}")
-            print(f"  Benchmark final value: {benchmark_metrics['benchmark']['final_value']:.2f}")
-        else:
-            underperformance = benchmark_metrics['benchmark']['total_return'] - model_total_return
-            print(f"  Benchmark WINS by {underperformance:.2f} percentage points!")
-            print(f"  Benchmark final value: {benchmark_metrics['benchmark']['final_value']:.2f}")
-            print(f"  Model final value: {model_final_value:.2f}")
+        # print(f"\n🏆 WINNER ANALYSIS:")
+        # if model_total_return > benchmark_metrics['benchmark']['total_return']:
+        #     outperformance = model_total_return - benchmark_metrics['benchmark']['total_return']
+        #     print(f"  Model Strategy WINS by {outperformance:.2f} percentage points!")
+        #     print(f"  Model final value: {model_final_value:.2f}")
+        #     print(f"  Benchmark final value: {benchmark_metrics['benchmark']['final_value']:.2f}")
+        # else:
+        #     underperformance = benchmark_metrics['benchmark']['total_return'] - model_total_return
+        #     print(f"  Benchmark WINS by {underperformance:.2f} percentage points!")
+        #     print(f"  Benchmark final value: {benchmark_metrics['benchmark']['final_value']:.2f}")
+        #     print(f"  Model final value: {model_final_value:.2f}")
         
         # Trading activity analysis
         signals = self.model_portfolio_data['Signal'].dropna()
@@ -465,8 +482,8 @@ def main():
     """
     Main function to run the portfolio visualization with model comparison
     """
-    print("🚀 Starting Portfolio Visualization Tool")
-    print("📊 Comparing Benchmark vs Model Strategy Performance")
+    print("\n"*5+"🚀 Starting Portfolio Visualization Tool")
+    # print("📊 Comparing Benchmark vs Model Strategy Performance")
     
     # Initialize visualizer (defaults to OMXS30 as benchmark)
     visualizer = PortfolioVisualizer()
@@ -479,23 +496,12 @@ def main():
     visualizer.calculate_benchmark_performance()
     
     try:
-        # Load the machine learning model (XGBoost or Random Forest)
-        print("\n🤖 Loading trained model...")
         visualizer.load_model()
-        
-        # Simulate model-based trading strategy
-        print("📊 Simulating model-based trading strategy...")
-        visualizer.simulate_model_strategy(debug=True)
-        
-        # Print comparison summary
-        visualizer.print_strategy_comparison()
-        
-        # Create comparison visualizations
-        print("\n📊 Creating strategy comparison visualizations...")
+        visualizer.simulate_model_strategy(debug=False)        
+        visualizer.print_strategy_comparison()        
         visualizer.create_portfolio_visualization(save_plots=True)
         
         print("\n✅ Strategy comparison complete!")
-        print("📋 Check 'portfolio_comparison.png' for detailed charts")
         
     except Exception as e:
         print(f"\n⚠️ Could not load model or run model strategy: {str(e)}")

@@ -423,7 +423,7 @@ def analyze_walk_forward_results(results, feature_names):
     axes[1, 1].grid(True, alpha=0.3)
     
     plt.tight_layout()
-    plt.savefig('walk_forward_analysis.png', dpi=300, bbox_inches='tight')
+    plt.savefig('visualizer/images/walk_forward_analysis.png', dpi=300, bbox_inches='tight')
     plt.show()
     
     # Detailed split-by-split analysis
