@@ -355,52 +355,51 @@ class PortfolioVisualizer:
         
         # Plot 2: Model Trading Signals (Actual Trades Only)
         if hasattr(self, 'model_portfolio_data') and hasattr(self, 'model_trades_data'):
-            # Plot stock price as background
-            ax2_price = ax2.twinx()
-            ax2_price.plot(self.model_portfolio_data['Date'], self.model_portfolio_data['Close'], 
-                          color='gray', alpha=0.3, linewidth=1, label=f'{self.benchmark_stock} Price')
-            ax2_price.set_ylabel(f'{self.benchmark_stock} Price', fontsize=12, color='gray')
-            ax2_price.tick_params(axis='y', labelcolor='gray')
+            # Plot stock price as main chart
+            ax2.plot(self.model_portfolio_data['Date'], self.model_portfolio_data['Close'], 
+                    color='gray', alpha=0.7, linewidth=2, label=f'{self.benchmark_stock} Price')
             
             if not self.model_trades_data.empty:
+                # Merge trades with model portfolio data to get stock prices at trade dates
+                trades_with_prices = pd.merge(
+                    self.model_trades_data,
+                    self.model_portfolio_data[['Date', 'Close']],
+                    left_on='date',
+                    right_on='Date',
+                    how='left'
+                )
+                
                 # Separate actual trades by type
-                buy_trades = self.model_trades_data[self.model_trades_data['type'] == 'buy']
-                sell_trades = self.model_trades_data[self.model_trades_data['type'] == 'sell']
+                buy_trades = trades_with_prices[trades_with_prices['type'] == 'buy']
+                sell_trades = trades_with_prices[trades_with_prices['type'] == 'sell']
                 
-                # Plot actual buy trades (green triangles pointing up)
+                # Plot actual buy trades (green triangles pointing up) on stock price
                 if not buy_trades.empty:
-                    ax2.scatter(buy_trades['date'], [2] * len(buy_trades), 
-                               color='green', marker='^', s=60, alpha=0.9, 
-                               label=f'Buy Trades ({len(buy_trades)})', edgecolors='darkgreen', linewidth=1)
+                    ax2.scatter(buy_trades['date'], buy_trades['Close'], 
+                               color='green', marker='^', s=80, alpha=0.9, 
+                               label=f'Buy Trades ({len(buy_trades)})', edgecolors='darkgreen', linewidth=2, zorder=5)
                 
-                # Plot actual sell trades (red triangles pointing down)
+                # Plot actual sell trades (red triangles pointing down) on stock price
                 if not sell_trades.empty:
-                    ax2.scatter(sell_trades['date'], [0] * len(sell_trades), 
-                               color='red', marker='v', s=60, alpha=0.9, 
-                               label=f'Sell Trades ({len(sell_trades)})', edgecolors='darkred', linewidth=1)
-                
-                # Add a horizontal line at hold level for reference
-                ax2.axhline(y=1, color='blue', alpha=0.3, linestyle='-', linewidth=2, label='Hold (No Trade)')
-                
-                ax2.set_ylim(-0.5, 2.5)
-                ax2.set_yticks([0, 1, 2])
-                ax2.set_yticklabels(['Sell Trade', 'Hold', 'Buy Trade'])
+                    ax2.scatter(sell_trades['date'], sell_trades['Close'], 
+                               color='red', marker='v', s=80, alpha=0.9, 
+                               label=f'Sell Trades ({len(sell_trades)})', edgecolors='darkred', linewidth=2, zorder=5)
                 
                 # Add trade count to title
                 total_trades = len(buy_trades) + len(sell_trades)
-                ax2.set_title(f'Actual Trading Activity - {total_trades} Trades (Buy: {len(buy_trades)}, Sell: {len(sell_trades)})', 
+                ax2.set_title(f'Stock Price with Trading Signals - {total_trades} Trades (Buy: {len(buy_trades)}, Sell: {len(sell_trades)})', 
                              fontsize=16, fontweight='bold')
             else:
                 ax2.text(0.5, 0.5, 'No trades executed', 
                         transform=ax2.transAxes, ha='center', va='center', fontsize=14)
-                ax2.set_title('Actual Trading Activity - No Trades', fontsize=16, fontweight='bold')
+                ax2.set_title('Stock Price with Trading Signals - No Trades', fontsize=16, fontweight='bold')
         else:
             ax2.text(0.5, 0.5, 'No model data available', 
                     transform=ax2.transAxes, ha='center', va='center', fontsize=14)
-            ax2.set_title('Actual Trading Activity', fontsize=16, fontweight='bold')
+            ax2.set_title('Stock Price with Trading Signals', fontsize=16, fontweight='bold')
         
         ax2.set_xlabel('Date', fontsize=12)
-        ax2.set_ylabel('Trade Type', fontsize=12)
+        ax2.set_ylabel('Stock Price', fontsize=12)
         ax2.legend(loc='upper left', fontsize=10)
         ax2.grid(True, alpha=0.3)
         
