@@ -511,7 +511,7 @@ def main():
     # print("📊 Comparing Benchmark vs Model Strategy Performance")
     
     # Initialize visualizer (defaults to OMXS30 as benchmark)
-    visualizer = PortfolioVisualizer(benchmark_stock="atlascopco")
+    visualizer = PortfolioVisualizer(benchmark_stock="OMXS30")
     
     # Load data
     visualizer.load_data()
