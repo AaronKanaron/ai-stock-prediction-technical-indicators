@@ -5,10 +5,8 @@ from sklearn.metrics import classification_report, confusion_matrix, accuracy_sc
 from sklearn.metrics import precision_score, recall_score, f1_score
 import matplotlib.pyplot as plt
 import seaborn as sns
-import os
 import joblib
 import datetime
-import json
 from dateutil.relativedelta import relativedelta
 from progress.bar import Bar
 import warnings
@@ -24,18 +22,6 @@ class WalkForwardValidator:
         self.test_months = test_months
         self.step_months = step_months
         self.results = None
-        
-    def get_available_datasets(self, data_dir='data'):
-        """Get list of available datasets."""
-        if not os.path.exists(data_dir):
-            return []
-        
-        datasets = []
-        for file in os.listdir(data_dir):
-            if file.endswith('.csv'):
-                datasets.append(file.replace('.csv', ''))
-        
-        return sorted(datasets)
 
     def load_datasets(self, dataset_names):
         """Load and combine multiple datasets."""
@@ -141,15 +127,15 @@ class WalkForwardValidator:
 
     def train_model(self, X_train, y_train, params=None):
         """Train XGBoost classifier with class balancing."""
-        default_params = {
-            'n_estimators': 400,
-            'max_depth': 5,
+        model_params = {
+            'n_estimators': 200,
+            'max_depth': 3,
             'learning_rate': 0.1,
             'subsample': 0.8,
             'colsample_bytree': 0.8,
-            'min_child_weight': 50,
-            'reg_alpha': 0.1,
-            'reg_lambda': 1.0,
+            'min_child_weight': 100,
+            'reg_alpha': 0.5,
+            'reg_lambda': 2.0,
             'random_state': 42,
             'n_jobs': -1,
             'eval_metric': 'mlogloss',
@@ -158,10 +144,10 @@ class WalkForwardValidator:
         }
         
         if params:
-            default_params.update(params)
-        
-        model = XGBClassifier(**default_params)
-        
+            model_params.update(params)
+
+        model = XGBClassifier(**model_params)
+
         # Handle class imbalance with sample weights
         class_weights = self.compute_class_weights(y_train)
         sample_weights = [class_weights.get(label, 1.0) for label in y_train]
@@ -354,18 +340,18 @@ class WalkForwardValidator:
         plt.savefig('visualizer/images/walk_forward_analysis.png', dpi=300, bbox_inches='tight')
         plt.show()
 
-    def save_results(self, feature_names, importance_df, dataset_names):
-        """Save validation results and best model."""
+    def save_best_model(self, dataset_names):
+        """Save the best performing model."""
         if self.results is None:
-            raise ValueError("No results to save")
+            raise ValueError("No results available. Run validation first.")
         
-        timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-        
-        # Save best model
+        # Find best model based on validation accuracy
         val_accuracies = self.results['summary_metrics']['val_accuracy']
         best_split_idx = np.argmax(val_accuracies)
         best_model = self.results['models'][best_split_idx]
         
+        # Generate filename
+        timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
         if len(dataset_names) == 1:
             model_filename = f'walkforward_xgboost_{dataset_names[0]}_{timestamp}.pkl'
         else:
@@ -374,78 +360,15 @@ class WalkForwardValidator:
                 dataset_str += f"_plus{len(dataset_names)-3}more"
             model_filename = f'walkforward_xgboost_combined_{dataset_str}_{timestamp}.pkl'
         
+        # Save model
         joblib.dump(best_model, f"models/{model_filename}")
         
-        # Create log entry
-        log_entry = self._create_log_entry(model_filename, dataset_names, best_split_idx, 
-                                         feature_names, importance_df, timestamp)
-        
-        # Save to log file
-        self._save_to_log(log_entry)
-        
-        print(f"\nResults saved:")
-        print(f"  Model: {model_filename}")
+        print(f"\nModel saved:")
+        print(f"  Filename: {model_filename}")
         print(f"  Best split: {best_split_idx + 1}")
         print(f"  Best validation accuracy: {val_accuracies[best_split_idx]:.4f}")
         
-        return model_filename, log_entry
-
-    def _create_log_entry(self, model_filename, dataset_names, best_split_idx, 
-                         feature_names, importance_df, timestamp):
-        """Create comprehensive log entry."""
-        best_model = self.results['models'][best_split_idx]
-        metrics = self.results['summary_metrics']
-        
-        log_entry = {
-            'timestamp': datetime.datetime.now().isoformat(),
-            'validation_type': 'walk_forward',
-            'model_type': 'XGBoost',
-            'model_filename': model_filename,
-            'datasets_used': dataset_names,
-            'best_split': int(best_split_idx + 1),
-            'total_splits': len(self.results['splits']),
-            'parameters': {
-                'n_estimators': int(best_model.n_estimators),
-                'max_depth': int(best_model.max_depth),
-                'learning_rate': float(best_model.learning_rate),
-                'subsample': float(best_model.subsample),
-                'colsample_bytree': float(best_model.colsample_bytree),
-                'min_child_weight': float(best_model.min_child_weight),
-                'reg_alpha': float(best_model.reg_alpha),
-                'reg_lambda': float(best_model.reg_lambda),
-                'random_state': int(best_model.random_state)
-            },
-            'features': {
-                'feature_count': len(feature_names),
-                'top_10_features': importance_df.head(10)['feature'].tolist()
-            },
-            'summary_metrics': {
-                'mean_test_accuracy': float(np.mean(metrics['test_accuracy'])),
-                'std_test_accuracy': float(np.std(metrics['test_accuracy'])),
-                'mean_test_f1': float(np.mean(metrics['test_f1'])),
-                'std_test_f1': float(np.std(metrics['test_f1']))
-            }
-        }
-        
-        return log_entry
-
-    def _save_to_log(self, log_entry):
-        """Save log entry to file."""
-        log_file = 'walk_forward_log.json'
-        
-        try:
-            if os.path.exists(log_file):
-                with open(log_file, 'r') as f:
-                    logs = json.load(f)
-            else:
-                logs = []
-        except (json.JSONDecodeError, FileNotFoundError):
-            logs = []
-        
-        logs.append(log_entry)
-        
-        with open(log_file, 'w') as f:
-            json.dump(logs, f, indent=2)
+        return model_filename, best_model
 
 
 def main(dataset_names=None, feature_columns=None, model_params=None):
@@ -458,28 +381,21 @@ def main(dataset_names=None, feature_columns=None, model_params=None):
     
     validator = WalkForwardValidator()
     
-    # Show available datasets
-    available = validator.get_available_datasets()
-    print(f"Available datasets: {', '.join(available)}")
     print(f"Using datasets: {', '.join(dataset_names)}")
     
     # Load and combine datasets
-    print("\nLoading datasets...")
     df = validator.load_datasets(dataset_names)
     print(f"Combined dataset: {df.shape[0]} rows, {df.shape[1]} columns")
     print(f"Date range: {df['Date'].min()} to {df['Date'].max()}")
     
-    # Run validation
     print("\nStarting walk-forward validation...")
     results, feature_names = validator.run_validation(df, feature_columns, model_params)
     
-    # Analyze results
     print("\nAnalyzing results...")
     importance_df = validator.analyze_results(feature_names)
     
-    # Save results
-    print("\nSaving results...")
-    model_filename, log_entry = validator.save_results(feature_names, importance_df, dataset_names)
+    print("\nSaving best model...")
+    model_filename, best_model = validator.save_best_model(dataset_names)
     
     # Final summary
     metrics = results['summary_metrics']
@@ -492,21 +408,10 @@ def main(dataset_names=None, feature_columns=None, model_params=None):
         'results': results,
         'feature_importance': importance_df,
         'model_filename': model_filename,
+        'best_model': best_model,
         'validator': validator
     }
 
 
 if __name__ == "__main__":
-    # Example configurations
-    
-    # Single dataset
-    # result = main(['OMXS30'])
-    
-    # Multiple datasets
-    result = main(['atlascopco', 'electrolux', 'ericsson', 'getinge', 'handelsbanken', 
-                  'hmb', 'investor', 'nordea', 'sandvik', 'seb', 'skf', 'swedbank', 
-                  'telia', 'OMXS30'])
-    
-    # With custom features
-    # selected_features = ["Close", "Volume", "BB_middle", "RSI_14", "SMA_20", "BB_width"]
-    # result = main(['OMXS30'], feature_columns=selected_features)
+    results = main(["OMXS30", "SP500"])

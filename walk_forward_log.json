@@ -1107,5 +1107,734 @@
       "mean_test_f1": 0.3671634500396138,
       "std_test_f1": 0.02591828744107905
     }
+  },
+  {
+    "timestamp": "2025-09-17T22:16:05.241751",
+    "validation_type": "walk_forward",
+    "model_type": "XGBoost",
+    "model_filename": "walkforward_xgboost_combined_atlascopco_electrolux_ericsson_plus11more_20250917_221605.pkl",
+    "datasets_used": [
+      "atlascopco",
+      "electrolux",
+      "ericsson",
+      "getinge",
+      "handelsbanken",
+      "hmb",
+      "investor",
+      "nordea",
+      "sandvik",
+      "seb",
+      "skf",
+      "swedbank",
+      "telia",
+      "OMXS30"
+    ],
+    "best_split": 2,
+    "total_splits": 15,
+    "parameters": {
+      "n_estimators": 400,
+      "max_depth": 5,
+      "learning_rate": 0.1,
+      "subsample": 0.8,
+      "colsample_bytree": 0.8,
+      "min_child_weight": 50.0,
+      "reg_alpha": 0.1,
+      "reg_lambda": 1.0,
+      "random_state": 42
+    },
+    "features": {
+      "feature_count": 22,
+      "top_10_features": [
+        "BB_middle",
+        "Close",
+        "BB_upper",
+        "SMA_10",
+        "SMA_5",
+        "SMA_20",
+        "Low",
+        "BB_lower",
+        "High",
+        "Open"
+      ]
+    },
+    "summary_metrics": {
+      "mean_test_accuracy": 0.35970782746216856,
+      "std_test_accuracy": 0.02860209576741864,
+      "mean_test_f1": 0.3671634500396138,
+      "std_test_f1": 0.02591828744107905
+    }
+  },
+  {
+    "timestamp": "2025-09-17T22:16:41.807023",
+    "validation_type": "walk_forward",
+    "model_type": "XGBoost",
+    "model_filename": "walkforward_xgboost_combined_atlascopco_electrolux_ericsson_plus11more_20250917_221641.pkl",
+    "datasets_used": [
+      "atlascopco",
+      "electrolux",
+      "ericsson",
+      "getinge",
+      "handelsbanken",
+      "hmb",
+      "investor",
+      "nordea",
+      "sandvik",
+      "seb",
+      "skf",
+      "swedbank",
+      "telia",
+      "OMXS30"
+    ],
+    "best_split": 2,
+    "total_splits": 15,
+    "parameters": {
+      "n_estimators": 400,
+      "max_depth": 5,
+      "learning_rate": 0.1,
+      "subsample": 0.8,
+      "colsample_bytree": 0.8,
+      "min_child_weight": 50.0,
+      "reg_alpha": 0.1,
+      "reg_lambda": 1.0,
+      "random_state": 42
+    },
+    "features": {
+      "feature_count": 6,
+      "top_10_features": [
+        "SMA_20",
+        "Close",
+        "BB_middle",
+        "BB_width",
+        "RSI_14",
+        "Volume"
+      ]
+    },
+    "summary_metrics": {
+      "mean_test_accuracy": 0.36115523787169823,
+      "std_test_accuracy": 0.026002123656981912,
+      "mean_test_f1": 0.36725477709755,
+      "std_test_f1": 0.027562117642999068
+    }
+  },
+  {
+    "timestamp": "2025-09-17T22:17:56.782728",
+    "validation_type": "walk_forward",
+    "model_type": "XGBoost",
+    "model_filename": "walkforward_xgboost_combined_atlascopco_electrolux_ericsson_plus11more_20250917_221756.pkl",
+    "datasets_used": [
+      "atlascopco",
+      "electrolux",
+      "ericsson",
+      "getinge",
+      "handelsbanken",
+      "hmb",
+      "investor",
+      "nordea",
+      "sandvik",
+      "seb",
+      "skf",
+      "swedbank",
+      "telia",
+      "OMXS30"
+    ],
+    "best_split": 2,
+    "total_splits": 15,
+    "parameters": {
+      "n_estimators": 400,
+      "max_depth": 5,
+      "learning_rate": 0.1,
+      "subsample": 0.8,
+      "colsample_bytree": 0.8,
+      "min_child_weight": 50.0,
+      "reg_alpha": 0.1,
+      "reg_lambda": 1.0,
+      "random_state": 42
+    },
+    "features": {
+      "feature_count": 22,
+      "top_10_features": [
+        "BB_middle",
+        "Close",
+        "BB_upper",
+        "SMA_10",
+        "SMA_5",
+        "SMA_20",
+        "Low",
+        "BB_lower",
+        "High",
+        "Open"
+      ]
+    },
+    "summary_metrics": {
+      "mean_test_accuracy": 0.35970782746216856,
+      "std_test_accuracy": 0.02860209576741864,
+      "mean_test_f1": 0.3671634500396138,
+      "std_test_f1": 0.02591828744107905
+    }
+  },
+  {
+    "timestamp": "2025-09-17T22:18:27.332969",
+    "validation_type": "walk_forward",
+    "model_type": "XGBoost",
+    "model_filename": "walkforward_xgboost_combined_atlascopco_electrolux_ericsson_plus11more_20250917_221827.pkl",
+    "datasets_used": [
+      "atlascopco",
+      "electrolux",
+      "ericsson",
+      "getinge",
+      "handelsbanken",
+      "hmb",
+      "investor",
+      "nordea",
+      "sandvik",
+      "seb",
+      "skf",
+      "swedbank",
+      "telia",
+      "OMXS30"
+    ],
+    "best_split": 2,
+    "total_splits": 15,
+    "parameters": {
+      "n_estimators": 400,
+      "max_depth": 5,
+      "learning_rate": 0.1,
+      "subsample": 0.8,
+      "colsample_bytree": 0.8,
+      "min_child_weight": 50.0,
+      "reg_alpha": 0.1,
+      "reg_lambda": 1.0,
+      "random_state": 42
+    },
+    "features": {
+      "feature_count": 22,
+      "top_10_features": [
+        "BB_middle",
+        "Close",
+        "BB_upper",
+        "SMA_10",
+        "SMA_5",
+        "SMA_20",
+        "Low",
+        "BB_lower",
+        "High",
+        "Open"
+      ]
+    },
+    "summary_metrics": {
+      "mean_test_accuracy": 0.35970782746216856,
+      "std_test_accuracy": 0.02860209576741864,
+      "mean_test_f1": 0.3671634500396138,
+      "std_test_f1": 0.02591828744107905
+    }
+  },
+  {
+    "timestamp": "2025-09-17T22:30:07.690896",
+    "validation_type": "walk_forward",
+    "model_type": "XGBoost",
+    "model_filename": "walkforward_xgboost_combined_atlascopco_electrolux_ericsson_plus11more_20250917_223007.pkl",
+    "datasets_used": [
+      "atlascopco",
+      "electrolux",
+      "ericsson",
+      "getinge",
+      "handelsbanken",
+      "hmb",
+      "investor",
+      "nordea",
+      "sandvik",
+      "seb",
+      "skf",
+      "swedbank",
+      "telia",
+      "OMXS30"
+    ],
+    "best_split": 13,
+    "total_splits": 15,
+    "parameters": {
+      "n_estimators": 400,
+      "max_depth": 5,
+      "learning_rate": 0.1,
+      "subsample": 0.8,
+      "colsample_bytree": 0.8,
+      "min_child_weight": 100.0,
+      "reg_alpha": 0.3,
+      "reg_lambda": 1.2,
+      "random_state": 42
+    },
+    "features": {
+      "feature_count": 22,
+      "top_10_features": [
+        "SMA_10",
+        "BB_width",
+        "SMA_20",
+        "BB_middle",
+        "Low",
+        "BB_upper",
+        "RSI_14",
+        "Open",
+        "Rolling_Std_20",
+        "BB_lower"
+      ]
+    },
+    "summary_metrics": {
+      "mean_test_accuracy": 0.36321340262770613,
+      "std_test_accuracy": 0.018755720739564694,
+      "mean_test_f1": 0.3698466797658762,
+      "std_test_f1": 0.02296568749858454
+    }
+  },
+  {
+    "timestamp": "2025-09-17T22:46:02.876496",
+    "validation_type": "walk_forward",
+    "model_type": "XGBoost",
+    "model_filename": "walkforward_xgboost_combined_seb_atlascopco_electrolux_plus2more_20250917_224602.pkl",
+    "datasets_used": [
+      "seb",
+      "atlascopco",
+      "electrolux",
+      "ericsson",
+      "OMXS30"
+    ],
+    "best_split": 4,
+    "total_splits": 15,
+    "parameters": {
+      "n_estimators": 400,
+      "max_depth": 5,
+      "learning_rate": 0.1,
+      "subsample": 0.8,
+      "colsample_bytree": 0.8,
+      "min_child_weight": 100.0,
+      "reg_alpha": 0.3,
+      "reg_lambda": 1.2,
+      "random_state": 42
+    },
+    "features": {
+      "feature_count": 29,
+      "top_10_features": [
+        "RSI_14",
+        "MACD_normalized",
+        "Volatility_20d",
+        "Price_vs_SMA50",
+        "BB_position",
+        "MACD_histogram",
+        "Trend_strength",
+        "RSI_7",
+        "Volume_rank",
+        "Volatility_5d"
+      ]
+    },
+    "summary_metrics": {
+      "mean_test_accuracy": 0.35846707449551407,
+      "std_test_accuracy": 0.03613149176058191,
+      "mean_test_f1": 0.3541552895768316,
+      "std_test_f1": 0.03548832248141681
+    }
+  },
+  {
+    "timestamp": "2025-09-17T22:54:18.029732",
+    "validation_type": "walk_forward",
+    "model_type": "XGBoost",
+    "model_filename": "walkforward_xgboost_combined_seb_atlascopco_electrolux_plus3more_20250917_225418.pkl",
+    "datasets_used": [
+      "seb",
+      "atlascopco",
+      "electrolux",
+      "ericsson",
+      "OMXS30",
+      "SP500"
+    ],
+    "best_split": 7,
+    "total_splits": 15,
+    "parameters": {
+      "n_estimators": 400,
+      "max_depth": 5,
+      "learning_rate": 0.1,
+      "subsample": 0.8,
+      "colsample_bytree": 0.8,
+      "min_child_weight": 100.0,
+      "reg_alpha": 0.3,
+      "reg_lambda": 1.2,
+      "random_state": 42
+    },
+    "features": {
+      "feature_count": 29,
+      "top_10_features": [
+        "RSI_14",
+        "Price_vs_SMA50",
+        "MACD_normalized",
+        "MACD_histogram",
+        "Trend_strength",
+        "Volatility_20d",
+        "Volatility_5d",
+        "BB_position",
+        "RSI_7",
+        "SMA20_trend"
+      ]
+    },
+    "summary_metrics": {
+      "mean_test_accuracy": 0.3592185941213946,
+      "std_test_accuracy": 0.025787834823941345,
+      "mean_test_f1": 0.3524205553184434,
+      "std_test_f1": 0.022269234998716886
+    }
+  },
+  {
+    "timestamp": "2025-09-17T22:55:39.124758",
+    "validation_type": "walk_forward",
+    "model_type": "XGBoost",
+    "model_filename": "walkforward_xgboost_combined_seb_atlascopco_electrolux_plus3more_20250917_225539.pkl",
+    "datasets_used": [
+      "seb",
+      "atlascopco",
+      "electrolux",
+      "ericsson",
+      "OMXS30",
+      "SP500"
+    ],
+    "best_split": 1,
+    "total_splits": 15,
+    "parameters": {
+      "n_estimators": 400,
+      "max_depth": 5,
+      "learning_rate": 0.1,
+      "subsample": 0.8,
+      "colsample_bytree": 0.8,
+      "min_child_weight": 100.0,
+      "reg_alpha": 0.3,
+      "reg_lambda": 1.2,
+      "random_state": 42
+    },
+    "features": {
+      "feature_count": 22,
+      "top_10_features": [
+        "Close",
+        "BB_middle",
+        "MACD",
+        "SMA_20",
+        "SMA_10",
+        "Low",
+        "RSI_14",
+        "BB_lower",
+        "SMA_5",
+        "BB_upper"
+      ]
+    },
+    "summary_metrics": {
+      "mean_test_accuracy": 0.38731566212671736,
+      "std_test_accuracy": 0.0560775475582628,
+      "mean_test_f1": 0.39626265786991344,
+      "std_test_f1": 0.06253145722852402
+    }
+  },
+  {
+    "timestamp": "2025-09-17T22:59:41.440201",
+    "validation_type": "walk_forward",
+    "model_type": "XGBoost",
+    "model_filename": "walkforward_xgboost_combined_seb_atlascopco_electrolux_plus1more_20250917_225941.pkl",
+    "datasets_used": [
+      "seb",
+      "atlascopco",
+      "electrolux",
+      "ericsson"
+    ],
+    "best_split": 4,
+    "total_splits": 15,
+    "parameters": {
+      "n_estimators": 400,
+      "max_depth": 5,
+      "learning_rate": 0.1,
+      "subsample": 0.8,
+      "colsample_bytree": 0.8,
+      "min_child_weight": 100.0,
+      "reg_alpha": 0.3,
+      "reg_lambda": 1.2,
+      "random_state": 42
+    },
+    "features": {
+      "feature_count": 29,
+      "top_10_features": [
+        "RSI_14",
+        "MACD_normalized",
+        "MACD_histogram",
+        "Volatility_20d",
+        "Price_vs_SMA50",
+        "Volume_rank",
+        "Trend_strength",
+        "RSI_7",
+        "Volatility_5d",
+        "BB_position"
+      ]
+    },
+    "summary_metrics": {
+      "mean_test_accuracy": 0.3495078782783701,
+      "std_test_accuracy": 0.02777941225105564,
+      "mean_test_f1": 0.34526229348867055,
+      "std_test_f1": 0.02597581074039589
+    }
+  },
+  {
+    "timestamp": "2025-09-17T23:06:10.724656",
+    "validation_type": "walk_forward",
+    "model_type": "XGBoost",
+    "model_filename": "walkforward_xgboost_combined_seb_atlascopco_electrolux_plus1more_20250917_230610.pkl",
+    "datasets_used": [
+      "seb",
+      "atlascopco",
+      "electrolux",
+      "ericsson"
+    ],
+    "best_split": 3,
+    "total_splits": 15,
+    "parameters": {
+      "n_estimators": 400,
+      "max_depth": 5,
+      "learning_rate": 0.1,
+      "subsample": 0.8,
+      "colsample_bytree": 0.8,
+      "min_child_weight": 100.0,
+      "reg_alpha": 0.3,
+      "reg_lambda": 1.2,
+      "random_state": 42
+    },
+    "features": {
+      "feature_count": 22,
+      "top_10_features": [
+        "SMA_5",
+        "SMA_10",
+        "Open",
+        "RSI_14",
+        "Low",
+        "BB_middle",
+        "Close",
+        "High",
+        "MACD_histogram",
+        "BB_upper"
+      ]
+    },
+    "summary_metrics": {
+      "mean_test_accuracy": 0.336783220892158,
+      "std_test_accuracy": 0.04441163196351938,
+      "mean_test_f1": 0.33572746682620197,
+      "std_test_f1": 0.04284005163271645
+    }
+  },
+  {
+    "timestamp": "2025-09-17T23:08:52.621574",
+    "validation_type": "walk_forward",
+    "model_type": "XGBoost",
+    "model_filename": "walkforward_xgboost_ericsson_20250917_230852.pkl",
+    "datasets_used": [
+      "ericsson"
+    ],
+    "best_split": 8,
+    "total_splits": 15,
+    "parameters": {
+      "n_estimators": 300,
+      "max_depth": 5,
+      "learning_rate": 0.1,
+      "subsample": 0.8,
+      "colsample_bytree": 0.8,
+      "min_child_weight": 50.0,
+      "reg_alpha": 0.1,
+      "reg_lambda": 1.0,
+      "random_state": 42
+    },
+    "features": {
+      "feature_count": 22,
+      "top_10_features": [
+        "BB_middle",
+        "SMA_20",
+        "MACD",
+        "BB_upper",
+        "BB_lower",
+        "Open",
+        "MACD_histogram",
+        "RSI_14",
+        "Return_1d",
+        "MACD_signal"
+      ]
+    },
+    "summary_metrics": {
+      "mean_test_accuracy": 0.3437403403929052,
+      "std_test_accuracy": 0.08258830870402166,
+      "mean_test_f1": 0.338475270392291,
+      "std_test_f1": 0.08623553481870597
+    }
+  },
+  {
+    "timestamp": "2025-09-17T23:09:31.775887",
+    "validation_type": "walk_forward",
+    "model_type": "XGBoost",
+    "model_filename": "walkforward_xgboost_OMXS30_20250917_230931.pkl",
+    "datasets_used": [
+      "OMXS30"
+    ],
+    "best_split": 1,
+    "total_splits": 15,
+    "parameters": {
+      "n_estimators": 300,
+      "max_depth": 5,
+      "learning_rate": 0.1,
+      "subsample": 0.8,
+      "colsample_bytree": 0.8,
+      "min_child_weight": 50.0,
+      "reg_alpha": 0.1,
+      "reg_lambda": 1.0,
+      "random_state": 42
+    },
+    "features": {
+      "feature_count": 22,
+      "top_10_features": [
+        "RSI_14",
+        "BB_middle",
+        "SMA_20",
+        "MACD_signal",
+        "SMA_5",
+        "MACD",
+        "BB_lower",
+        "BB_width",
+        "BB_upper",
+        "Return_10d_lag"
+      ]
+    },
+    "summary_metrics": {
+      "mean_test_accuracy": 0.43439896539942807,
+      "std_test_accuracy": 0.12816875988012474,
+      "mean_test_f1": 0.43050790715001885,
+      "std_test_f1": 0.12552070702287474
+    }
+  },
+  {
+    "timestamp": "2025-09-18T13:22:52.993146",
+    "validation_type": "walk_forward",
+    "model_type": "XGBoost",
+    "model_filename": "walkforward_xgboost_combined_OMXS30_SP500_20250918_132252.pkl",
+    "datasets_used": [
+      "OMXS30",
+      "SP500"
+    ],
+    "best_split": 8,
+    "total_splits": 15,
+    "parameters": {
+      "n_estimators": 300,
+      "max_depth": 5,
+      "learning_rate": 0.1,
+      "subsample": 0.8,
+      "colsample_bytree": 0.8,
+      "min_child_weight": 50.0,
+      "reg_alpha": 0.1,
+      "reg_lambda": 1.0,
+      "random_state": 42
+    },
+    "features": {
+      "feature_count": 22,
+      "top_10_features": [
+        "RSI_14",
+        "BB_middle",
+        "SMA_5",
+        "High",
+        "BB_upper",
+        "Open",
+        "BB_width",
+        "SMA_20",
+        "MACD_signal",
+        "Rolling_Std_20"
+      ]
+    },
+    "summary_metrics": {
+      "mean_test_accuracy": 0.47078705756852524,
+      "std_test_accuracy": 0.13688003321538653,
+      "mean_test_f1": 0.47974779314648164,
+      "std_test_f1": 0.1336914109267583
+    }
+  },
+  {
+    "timestamp": "2025-09-18T14:09:33.840110",
+    "validation_type": "walk_forward",
+    "model_type": "XGBoost",
+    "model_filename": "walkforward_xgboost_combined_OMXS30_SP500_20250918_140933.pkl",
+    "datasets_used": [
+      "OMXS30",
+      "SP500"
+    ],
+    "best_split": 7,
+    "total_splits": 15,
+    "parameters": {
+      "n_estimators": 300,
+      "max_depth": 5,
+      "learning_rate": 0.1,
+      "subsample": 0.8,
+      "colsample_bytree": 0.8,
+      "min_child_weight": 50.0,
+      "reg_alpha": 0.1,
+      "reg_lambda": 1.0,
+      "random_state": 42
+    },
+    "features": {
+      "feature_count": 30,
+      "top_10_features": [
+        "MACD_normalized",
+        "Price_vs_SMA50",
+        "BB_squeeze",
+        "Price_vs_SMA20",
+        "Volatility_20d",
+        "BB_position",
+        "MACD_histogram",
+        "SMA20_trend",
+        "Price_vs_SMA10",
+        "BB_width"
+      ]
+    },
+    "summary_metrics": {
+      "mean_test_accuracy": 0.3600606643316685,
+      "std_test_accuracy": 0.04488323290378847,
+      "mean_test_f1": 0.3658010037001173,
+      "std_test_f1": 0.05092273524501266
+    }
+  },
+  {
+    "timestamp": "2025-09-18T14:10:42.584877",
+    "validation_type": "walk_forward",
+    "model_type": "XGBoost",
+    "model_filename": "walkforward_xgboost_combined_OMXS30_SP500_20250918_141042.pkl",
+    "datasets_used": [
+      "OMXS30",
+      "SP500"
+    ],
+    "best_split": 7,
+    "total_splits": 15,
+    "parameters": {
+      "n_estimators": 300,
+      "max_depth": 4,
+      "learning_rate": 0.1,
+      "subsample": 0.8,
+      "colsample_bytree": 0.8,
+      "min_child_weight": 50.0,
+      "reg_alpha": 0.1,
+      "reg_lambda": 1.0,
+      "random_state": 42
+    },
+    "features": {
+      "feature_count": 30,
+      "top_10_features": [
+        "MACD_normalized",
+        "BB_squeeze",
+        "Price_vs_SMA50",
+        "Price_vs_SMA20",
+        "Volatility_20d",
+        "BB_position",
+        "MACD_histogram",
+        "RSI_14",
+        "Volume_rank",
+        "SMA20_trend"
+      ]
+    },
+    "summary_metrics": {
+      "mean_test_accuracy": 0.36349763508396576,
+      "std_test_accuracy": 0.054348208105828605,
+      "mean_test_f1": 0.3662947012204574,
+      "std_test_f1": 0.06363541804699137
+    }
   }
 ]

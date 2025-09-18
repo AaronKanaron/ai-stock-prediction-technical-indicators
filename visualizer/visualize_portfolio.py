@@ -19,17 +19,38 @@ class PortfolioVisualizer:
         
     def load_data(self):
         """
-        Load benchmark stock data from processed CSV files
+        Load both processed data (for model features) and raw data (for Close price)
         """
         print(f"Loading {self.benchmark_stock} data...")
         
-        # Load benchmark data
-        benchmark_path = os.path.join(self.data_path, f"{self.benchmark_stock}.csv")
-        self.benchmark_data = pd.read_csv(benchmark_path)
-        self.benchmark_data['Date'] = pd.to_datetime(self.benchmark_data['Date'])
-        self.benchmark_data = self.benchmark_data.sort_values('Date').reset_index(drop=True)
+        # Load processed data (for model predictions)
+        processed_path = os.path.join(self.data_path, f"{self.benchmark_stock}.csv")
+        self.processed_data = pd.read_csv(processed_path)
+        self.processed_data['Date'] = pd.to_datetime(self.processed_data['Date'])
+        self.processed_data = self.processed_data.sort_values('Date').reset_index(drop=True)
         
-        print(f"{self.benchmark_stock} data: {len(self.benchmark_data)} records from {self.benchmark_data['Date'].min()} to {self.benchmark_data['Date'].max()}")
+        # Load raw data (for Close price)
+        raw_path = os.path.join("rawdata", f"{self.benchmark_stock}_rawdata.csv")
+        self.raw_data = pd.read_csv(raw_path)
+        self.raw_data['Date'] = pd.to_datetime(self.raw_data['Date'])
+        self.raw_data = self.raw_data.sort_values('Date').reset_index(drop=True)
+        
+        # Merge Close price from raw data with processed data
+        self.benchmark_data = pd.merge(
+            self.processed_data,
+            self.raw_data[['Date', 'Close']],
+            on='Date',
+            how='left'
+        )
+        
+        print(f"Processed data: {len(self.processed_data)} records")
+        print(f"Raw data: {len(self.raw_data)} records") 
+        print(f"Combined data: {len(self.benchmark_data)} records from {self.benchmark_data['Date'].min()} to {self.benchmark_data['Date'].max()}")
+        
+        # Check for missing Close prices
+        missing_close = self.benchmark_data['Close'].isna().sum()
+        if missing_close > 0:
+            print(f"Warning: {missing_close} rows missing Close price - these will be handled during calculations")
         
     def calculate_benchmark_performance(self):
         """
@@ -57,7 +78,7 @@ class PortfolioVisualizer:
         """
         if model_path is None:
             # Try to find XGBoost model
-            xgboost_files = [f for f in os.listdir("./models") if f.startswith("walkforward_xgboost") and f.endswith(".pkl")]
+            xgboost_files = [f for f in os.listdir("./models") if f.startswith("walkforward") and f.endswith(".pkl")]
             
             if xgboost_files:
                 model_path = os.path.join("./models", sorted(xgboost_files)[-1])
@@ -72,18 +93,35 @@ class PortfolioVisualizer:
         """
         Generate model predictions for trading signals using pre-calculated indicators
         """
-        # Model features (all technical indicators are already in the data)
+        # Updated model features that match your new training data
         model_features = [
-            "Open", "High", "Low", "Close", "Volume", "SMA_5", "SMA_10", "SMA_20", 
-            "RSI_14", "MACD", "MACD_signal", "MACD_histogram", "BB_upper", 
-            "BB_middle", "BB_lower", "BB_width", "Rolling_Std_20", "Return_1d", 
-            "Return_5d_lag", "Return_10d_lag", "SMA_ratio", "Price_change_20d"
+            "Price_vs_SMA5", "Price_vs_SMA10", "Price_vs_SMA20", "Price_vs_SMA50",
+            "SMA5_trend", "SMA20_trend", "RSI_14", "RSI_7", "RSI_oversold", 
+            "RSI_overbought", "RSI_neutral", "BB_width", "BB_position", "BB_squeeze",
+            "Volume_ratio", "Volume_rank", "MACD_histogram", "MACD_normalized", 
+            "Rolling_Std_20", "Return_1d", "Return_5d", "Return_1d_lag1", 
+            "Return_3d_lag1", "Return_5d_lag1", "Volatility_5d", "Volatility_20d", 
+            "Volatility_ratio", "Daily_range", "Gap", "Trend_strength"
         ]
         
+        # Check which features are actually available in the data
+        available_features = [f for f in model_features if f in data.columns]
+        missing_features = [f for f in model_features if f not in data.columns]
+        
+        if missing_features:
+            print(f"Warning: Missing features in data: {missing_features}")
+        
+        if not available_features:
+            print("Error: No model features found in data")
+            return None
+        
+        print(f"Using {len(available_features)} features for predictions")
+        
         # Prepare features for prediction
-        feature_data = data[model_features].dropna()
+        feature_data = data[available_features].dropna()
         
         if feature_data.empty:
+            print("Error: No valid feature data after removing NaN values")
             return None
         
         # Generate predictions for 3-class classification (0=sell, 1=hold, 2=buy)
@@ -448,23 +486,7 @@ class PortfolioVisualizer:
         table.align["Annual Return"] = "r"
         table.align["Difference"] = "r"
 
-        print("\n" + str(table) + "\n")
-        
-        # Performance comparison
-        # print(f"\n🏆 WINNER ANALYSIS:")
-        # if model_total_return > benchmark_metrics['benchmark']['total_return']:
-        #     outperformance = model_total_return - benchmark_metrics['benchmark']['total_return']
-        #     print(f"  Model Strategy WINS by {outperformance:.2f} percentage points!")
-        #     print(f"  Model final value: {model_final_value:.2f}")
-        #     print(f"  Benchmark final value: {benchmark_metrics['benchmark']['final_value']:.2f}")
-        # else:
-        #     underperformance = benchmark_metrics['benchmark']['total_return'] - model_total_return
-        #     print(f"  Benchmark WINS by {underperformance:.2f} percentage points!")
-        #     print(f"  Benchmark final value: {benchmark_metrics['benchmark']['final_value']:.2f}")
-        #     print(f"  Model final value: {model_final_value:.2f}")
-        
-
-        
+        print("\n" + str(table) + "\n")        
         print("="*90)
         
         return {
@@ -489,7 +511,7 @@ def main():
     # print("📊 Comparing Benchmark vs Model Strategy Performance")
     
     # Initialize visualizer (defaults to OMXS30 as benchmark)
-    visualizer = PortfolioVisualizer(benchmark_stock="seb")
+    visualizer = PortfolioVisualizer(benchmark_stock="atlascopco")
     
     # Load data
     visualizer.load_data()
@@ -505,36 +527,36 @@ def main():
                 
     except Exception as e:
         print(f"\n⚠️ Could not load model or run model strategy: {str(e)}")
-        print("📊 Falling back to benchmark analysis only...")
+        # print("📊 Falling back to benchmark analysis only...")
         
-        # Fallback to simple benchmark analysis
-        metrics = visualizer.calculate_portfolio_metrics()
+        # # Fallback to simple benchmark analysis
+        # metrics = visualizer.calculate_portfolio_metrics()
         
-        print("\n" + "="*80)
-        print(f"{visualizer.benchmark_stock} BENCHMARK PERFORMANCE")
-        print("="*80)
-        print(f"Final Value: {metrics['benchmark']['final_value']:.2f}")
-        print(f"Total Return: {metrics['benchmark']['total_return']:+.2f}%")
-        print(f"Annualized Return: {metrics['benchmark']['annual_return']:+.2f}%")
-        print("="*80)
+        # print("\n" + "="*80)
+        # print(f"{visualizer.benchmark_stock} BENCHMARK PERFORMANCE")
+        # print("="*80)
+        # print(f"Final Value: {metrics['benchmark']['final_value']:.2f}")
+        # print(f"Total Return: {metrics['benchmark']['total_return']:+.2f}%")
+        # print(f"Annualized Return: {metrics['benchmark']['annual_return']:+.2f}%")
+        # print("="*80)
         
-        # Create simple visualization
-        fig, ax = plt.subplots(figsize=(12, 8))
-        plt.plot(visualizer.portfolio_data['Date'], visualizer.portfolio_data['Benchmark_Return_Pct'], 
-                linewidth=3, label=f'{visualizer.benchmark_stock} Benchmark', color='#2E86AB')
-        plt.axhline(y=0, color='black', linestyle='--', alpha=0.7, 
-                   label='Break-even (0%)')
-        plt.title(f'{visualizer.benchmark_stock} Returns Over Time (Benchmark Strategy)', fontsize=16, fontweight='bold')
-        plt.xlabel('Date', fontsize=12)
-        plt.ylabel('Return (%)', fontsize=12)
-        plt.legend(fontsize=12)
-        plt.grid(True, alpha=0.3)
-        ax.yaxis.set_major_formatter(plt.FuncFormatter(lambda x, p: f'{x:.0f}%'))
-        plt.tight_layout()
-        plt.savefig('portfolio_value.png', dpi=300, bbox_inches='tight')
-        plt.show()
+        # # Create simple visualization
+        # fig, ax = plt.subplots(figsize=(12, 8))
+        # plt.plot(visualizer.portfolio_data['Date'], visualizer.portfolio_data['Benchmark_Return_Pct'], 
+        #         linewidth=3, label=f'{visualizer.benchmark_stock} Benchmark', color='#2E86AB')
+        # plt.axhline(y=0, color='black', linestyle='--', alpha=0.7, 
+        #            label='Break-even (0%)')
+        # plt.title(f'{visualizer.benchmark_stock} Returns Over Time (Benchmark Strategy)', fontsize=16, fontweight='bold')
+        # plt.xlabel('Date', fontsize=12)
+        # plt.ylabel('Return (%)', fontsize=12)
+        # plt.legend(fontsize=12)
+        # plt.grid(True, alpha=0.3)
+        # ax.yaxis.set_major_formatter(plt.FuncFormatter(lambda x, p: f'{x:.0f}%'))
+        # plt.tight_layout()
+        # plt.savefig('portfolio_value.png', dpi=300, bbox_inches='tight')
+        # plt.show()
         
-        print("📋 Check 'portfolio_value.png' for the chart")
+        # print("📋 Check 'portfolio_value.png' for the chart")
 
 if __name__ == "__main__":
     main()
