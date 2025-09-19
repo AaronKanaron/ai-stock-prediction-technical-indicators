@@ -344,7 +344,7 @@ class PortfolioVisualizer:
         
         ax1.axhline(y=0, color='black', linestyle='--', alpha=0.7, label='Break-even (0%)')
         
-        ax1.set_title(f'Portfolio Return Comparison: {self.benchmark_stock} Benchmark vs Model Strategy (%)', fontsize=16, fontweight='bold')
+        ax1.set_title(f'Portfolio Return Comparison: {self.benchmark_stock.capitalize()} Benchmark vs Model Strategy (%)', fontsize=16, fontweight='bold')
         ax1.set_xlabel('Date', fontsize=12)
         ax1.set_ylabel('Return (%)', fontsize=12)
         ax1.legend(fontsize=12)
@@ -357,7 +357,7 @@ class PortfolioVisualizer:
         if hasattr(self, 'model_portfolio_data') and hasattr(self, 'model_trades_data'):
             # Plot stock price as main chart
             ax2.plot(self.model_portfolio_data['Date'], self.model_portfolio_data['Close'], 
-                    color='gray', alpha=0.7, linewidth=2, label=f'{self.benchmark_stock} Price')
+                    color='gray', alpha=0.7, linewidth=1, label=f'{self.benchmark_stock} Price')
             
             if not self.model_trades_data.empty:
                 # Merge trades with model portfolio data to get stock prices at trade dates
@@ -376,27 +376,27 @@ class PortfolioVisualizer:
                 # Plot actual buy trades (green triangles pointing up) on stock price
                 if not buy_trades.empty:
                     ax2.scatter(buy_trades['date'], buy_trades['Close'], 
-                               color='green', marker='^', s=80, alpha=0.9, 
-                               label=f'Buy Trades ({len(buy_trades)})', edgecolors='darkgreen', linewidth=2, zorder=5)
+                               color='green', marker='^', s=50, alpha=1.0, 
+                               label=f'Buy Trades ({len(buy_trades)})', edgecolors='darkgreen', linewidth=1, zorder=5)
                 
                 # Plot actual sell trades (red triangles pointing down) on stock price
                 if not sell_trades.empty:
                     ax2.scatter(sell_trades['date'], sell_trades['Close'], 
-                               color='red', marker='v', s=80, alpha=0.9, 
-                               label=f'Sell Trades ({len(sell_trades)})', edgecolors='darkred', linewidth=2, zorder=5)
+                               color='red', marker='v', s=50, alpha=1.0, 
+                               label=f'Sell Trades ({len(sell_trades)})', edgecolors='darkred', linewidth=1, zorder=5)
                 
                 # Add trade count to title
                 total_trades = len(buy_trades) + len(sell_trades)
-                ax2.set_title(f'Stock Price with Trading Signals - {total_trades} Trades (Buy: {len(buy_trades)}, Sell: {len(sell_trades)})', 
+                ax2.set_title(f'Trading Signals - {total_trades} Trades (Buy: {len(buy_trades)}, Sell: {len(sell_trades)})', 
                              fontsize=16, fontweight='bold')
             else:
                 ax2.text(0.5, 0.5, 'No trades executed', 
                         transform=ax2.transAxes, ha='center', va='center', fontsize=14)
-                ax2.set_title('Stock Price with Trading Signals - No Trades', fontsize=16, fontweight='bold')
+                ax2.set_title('Trading Signals - No Trades', fontsize=16, fontweight='bold')
         else:
             ax2.text(0.5, 0.5, 'No model data available', 
                     transform=ax2.transAxes, ha='center', va='center', fontsize=14)
-            ax2.set_title('Stock Price with Trading Signals', fontsize=16, fontweight='bold')
+            ax2.set_title('Trading Signals', fontsize=16, fontweight='bold')
         
         ax2.set_xlabel('Date', fontsize=12)
         ax2.set_ylabel('Stock Price', fontsize=12)
@@ -437,7 +437,7 @@ class PortfolioVisualizer:
         model_annual_return = ((model_final_value / 100.0) ** (1/years) - 1) * 100
         
         print("\n" + "="*90)
-        print(" "*20 + "STRATEGY PERFORMANCE COMPARISON")
+        print(" "*20 + f"{self.benchmark_stock.capitalize()} Strategy Comparison")
         print("="*90)
         
         # Period information
@@ -463,27 +463,30 @@ class PortfolioVisualizer:
         print(f"{'  Days in market (Hold+Buy):':<{label_width}} {((signals == 1)|(signals == 2)).mean()*100:>{num_width}.1f}%")
         print(f"{'  Days holding cash (Sell):':<{label_width}} {(signals == 0).mean()*100:>{num_width}.1f}%")
 
-        table = PrettyTable(["Strategy", "Total Return", "Annual Return", "Difference"])
+        table = PrettyTable(["Strategy", "Total Return", "Annual Return", "Difference (%p)", "Difference (%)"])
         table.add_row([
             "Benchmark",
             # f"{benchmark_metrics['benchmark']['final_value']:.2f}",
             f"{benchmark_metrics['benchmark']['total_return']:.2f}%",
             f"{benchmark_metrics['benchmark']['annual_return']:.2f}%",
-            f"{benchmark_metrics['benchmark']['total_return'] - model_total_return:.2f}%"
+            f"{benchmark_metrics['benchmark']['total_return'] - model_total_return:.2f}%",
+            f"{(benchmark_metrics['benchmark']['total_return'] - model_total_return)/abs(benchmark_metrics['benchmark']['total_return'])*100 if benchmark_metrics['benchmark']['total_return'] != 0 else 0:.2f}%"
         ])
         table.add_row([
             "Model Strategy",
             # f"{model_final_value:.2f}",
             f"{model_total_return:.2f}%",
             f"{model_annual_return:.2f}%",
-            f"{model_total_return - benchmark_metrics['benchmark']['total_return']:.2f}%"
+            f"{model_total_return - benchmark_metrics['benchmark']['total_return']:.2f}%",
+            f"{(model_total_return - benchmark_metrics['benchmark']['total_return'])/abs(benchmark_metrics['benchmark']['total_return'])*100 if benchmark_metrics['benchmark']['total_return'] != 0 else 0:.2f}%"
         ])
         
         table.align["Strategy"] = "l"
         # table.align["Final Value"] = "r"
         table.align["Total Return"] = "r"
         table.align["Annual Return"] = "r"
-        table.align["Difference"] = "r"
+        table.align["Difference (%p)"] = "r"
+        table.align["Difference (%)"] = "r"
 
         print("\n" + str(table) + "\n")        
         print("="*90)
@@ -510,7 +513,7 @@ def main():
     # print("📊 Comparing Benchmark vs Model Strategy Performance")
     
     # Initialize visualizer (defaults to OMXS30 as benchmark)
-    visualizer = PortfolioVisualizer(benchmark_stock="OMXS30")
+    visualizer = PortfolioVisualizer(benchmark_stock="hmb")
     
     # Load data
     visualizer.load_data()

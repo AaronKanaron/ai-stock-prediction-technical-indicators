@@ -24,14 +24,34 @@ class WalkForwardValidator:
         self.results = None
 
     def load_datasets(self, dataset_names):
+        # """Load and combine multiple datasets."""
+        # if isinstance(dataset_names, str):
+        #     dataset_names = [dataset_names]
+            
+        # dataframes = []
+        # for name in dataset_names:
+        #     df = pd.read_csv(f'data/{name}.csv')
+        #     df['dataset_source'] = name
+        #     dataframes.append(df)
+            
+        # combined_df = pd.concat(dataframes, ignore_index=True)
+        # return combined_df
         """Load and combine multiple datasets."""
         if isinstance(dataset_names, str):
             dataset_names = [dataset_names]
             
+        # Sort dataset names to ensure consistent processing order
+        sorted_dataset_names = sorted(dataset_names)
+        
         dataframes = []
-        for name in dataset_names:
+        for i, name in enumerate(sorted_dataset_names):
             df = pd.read_csv(f'data/{name}.csv')
             df['dataset_source'] = name
+            
+            # Add microseconds to date to avoid duplicate date conflicts
+            # Use consistent ordering based on alphabetical sort
+            df['Date'] = pd.to_datetime(df['Date']) + pd.Timedelta(microseconds=i)
+            
             dataframes.append(df)
             
         combined_df = pd.concat(dataframes, ignore_index=True)
@@ -128,7 +148,7 @@ class WalkForwardValidator:
     def train_model(self, X_train, y_train, params=None):
         """Train XGBoost classifier with class balancing."""
         model_params = {
-            'n_estimators': 200,
+            'n_estimators': 100,
             'max_depth': 3,
             'learning_rate': 0.1,
             'subsample': 0.8,
@@ -414,4 +434,4 @@ def main(dataset_names=None, feature_columns=None, model_params=None):
 
 
 if __name__ == "__main__":
-    results = main(["OMXS30", "SP500"])
+    results = main(["seb", "handelsbanken", "swedbank", "nordea", "volvo", "ericsson"])
