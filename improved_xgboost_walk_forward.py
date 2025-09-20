@@ -14,7 +14,7 @@ warnings.filterwarnings('ignore')
 
 
 class WalkForwardValidator:
-    """Walk-forward validation for time series classification with XGBoost."""
+    """Improved Walk-forward validation with proper regularization to fix overfitting."""
     
     def __init__(self, initial_months=24, validation_months=3, test_months=3, step_months=6):
         self.initial_months = initial_months
@@ -24,18 +24,6 @@ class WalkForwardValidator:
         self.results = None
 
     def load_datasets(self, dataset_names):
-        # """Load and combine multiple datasets."""
-        # if isinstance(dataset_names, str):
-        #     dataset_names = [dataset_names]
-            
-        # dataframes = []
-        # for name in dataset_names:
-        #     df = pd.read_csv(f'data/{name}.csv')
-        #     df['dataset_source'] = name
-        #     dataframes.append(df)
-            
-        # combined_df = pd.concat(dataframes, ignore_index=True)
-        # return combined_df
         """Load and combine multiple datasets."""
         if isinstance(dataset_names, str):
             dataset_names = [dataset_names]
@@ -58,7 +46,7 @@ class WalkForwardValidator:
         return combined_df
 
     def prepare_features(self, df, feature_columns=None, exclude_columns=None):
-        """Prepare feature matrix and target vector."""
+        """Prepare feature matrix and target vector with better feature selection."""
         if exclude_columns is None:
             exclude_columns = ['Date', 'Target', 'dataset_source']
         
@@ -77,14 +65,17 @@ class WalkForwardValidator:
         return X, y
 
     def compute_class_weights(self, y):
-        """Compute balanced class weights."""
+        """Compute balanced class weights with less aggressive balancing."""
         class_counts = y.value_counts().sort_index()
         total_samples = len(y)
         n_classes = len(class_counts)
         
         weights = {}
         for class_label in class_counts.index:
-            weights[class_label] = total_samples / (n_classes * class_counts[class_label])
+            # Less aggressive balancing to reduce overfitting
+            raw_weight = total_samples / (n_classes * class_counts[class_label])
+            # Cap the maximum weight to prevent extreme imbalance
+            weights[class_label] = min(raw_weight, 3.0)
         
         return weights
 
@@ -145,22 +136,26 @@ class WalkForwardValidator:
         
         return splits
 
-    def train_model(self, X_train, y_train, params=None):
-        """Train XGBoost classifier with class balancing."""
+    def train_model(self, X_train, y_train, X_val=None, y_val=None, params=None):
+        """Train XGBoost classifier with proper regularization to prevent overfitting."""
         model_params = {
-            'n_estimators': 150,
-            'max_depth': 5,
-            'learning_rate': 0.1,
-            'subsample': 0.8,
-            'colsample_bytree': 0.8,
-            'min_child_weight': 80,
-            'reg_alpha': 0.5,
-            'reg_lambda': 2.0,
+            # FIXED: Much more conservative parameters to prevent overfitting
+            'n_estimators': 50,          # Reduced from 150
+            'max_depth': 3,              # Reduced from 5  
+            'learning_rate': 0.05,       # Reduced from 0.1
+            'subsample': 0.7,            # Reduced from 0.8
+            'colsample_bytree': 0.7,     # Reduced from 0.8
+            'min_child_weight': 100,     # Increased from 80
+            'reg_alpha': 2.0,            # Increased from 0.5
+            'reg_lambda': 5.0,           # Increased from 2.0
             'random_state': 42,
             'n_jobs': -1,
             'eval_metric': 'mlogloss',
             'objective': 'multi:softprob',
-            'num_class': 3
+            'num_class': 3,
+            # NEW: Add early stopping parameters
+            'early_stopping_rounds': 10,
+            'verbose': False
         }
         
         if params:
@@ -168,11 +163,23 @@ class WalkForwardValidator:
 
         model = XGBClassifier(**model_params)
 
-        # Handle class imbalance with sample weights
+        # FIXED: More conservative class weights
         class_weights = self.compute_class_weights(y_train)
         sample_weights = [class_weights.get(label, 1.0) for label in y_train]
         
-        model.fit(X_train, y_train, sample_weight=sample_weights)
+        # Use early stopping if validation data is provided
+        if X_val is not None and y_val is not None:
+            val_sample_weights = [class_weights.get(label, 1.0) for label in y_val]
+            model.fit(
+                X_train, y_train, 
+                sample_weight=sample_weights,
+                eval_set=[(X_val, y_val)],
+                sample_weight_eval_set=[val_sample_weights],
+                verbose=False
+            )
+        else:
+            model.fit(X_train, y_train, sample_weight=sample_weights)
+        
         return model
 
     def evaluate_model(self, model, X, y):
@@ -193,7 +200,7 @@ class WalkForwardValidator:
         return metrics
 
     def run_validation(self, df, feature_columns=None, model_params=None):
-        """Execute walk-forward validation."""
+        """Execute walk-forward validation with early stopping."""
         splits = self.create_time_splits(df)
         
         if not splits:
@@ -221,8 +228,8 @@ class WalkForwardValidator:
             X_val, y_val = self.prepare_features(data['val'], feature_columns)
             X_test, y_test = self.prepare_features(data['test'], feature_columns)
             
-            # Train and evaluate model
-            model = self.train_model(X_train, y_train, model_params)
+            # Train with early stopping using validation set
+            model = self.train_model(X_train, y_train, X_val, y_val, model_params)
             
             train_metrics = self.evaluate_model(model, X_train, y_train)
             val_metrics = self.evaluate_model(model, X_val, y_val)
@@ -267,13 +274,29 @@ class WalkForwardValidator:
         
         metrics = self.results['summary_metrics']
         
-        print(f"\nWalk-Forward Validation Results ({len(self.results['splits'])} splits)")
+        print(f"\nImproved Walk-Forward Validation Results ({len(self.results['splits'])} splits)")
         print("-" * 60)
         
         for metric_name, values in metrics.items():
             mean_val = np.mean(values)
             std_val = np.std(values)
             print(f"{metric_name:15s}: {mean_val:.4f} ± {std_val:.4f}")
+        
+        # Check for overfitting
+        train_acc = np.mean(metrics['train_accuracy'])
+        val_acc = np.mean(metrics['val_accuracy'])
+        test_acc = np.mean(metrics['test_accuracy'])
+        
+        print(f"\nOverfitting Analysis:")
+        print(f"  Train-Val gap: {train_acc - val_acc:.4f} ({(train_acc - val_acc)*100:.1f}%)")
+        print(f"  Val-Test gap: {val_acc - test_acc:.4f} ({(val_acc - test_acc)*100:.1f}%)")
+        
+        if train_acc - val_acc > 0.10:
+            print("  ⚠️  WARNING: Significant overfitting detected!")
+        elif train_acc - val_acc > 0.05:
+            print("  ⚠️  CAUTION: Moderate overfitting detected.")
+        else:
+            print("  ✅ Overfitting appears controlled.")
         
         # Create visualization
         self._create_plots(feature_names)
@@ -308,7 +331,7 @@ class WalkForwardValidator:
         axes[0, 0].plot(splits, metrics['test_accuracy'], '^-', label='Test', linewidth=2)
         axes[0, 0].set_xlabel('Split Number')
         axes[0, 0].set_ylabel('Accuracy')
-        axes[0, 0].set_title('Accuracy Across Time Splits')
+        axes[0, 0].set_title('Accuracy Across Time Splits (Improved Model)')
         axes[0, 0].legend()
         axes[0, 0].grid(True, alpha=0.3)
         
@@ -318,7 +341,7 @@ class WalkForwardValidator:
         axes[0, 1].plot(splits, metrics['test_f1'], '^-', label='Test', linewidth=2)
         axes[0, 1].set_xlabel('Split Number')
         axes[0, 1].set_ylabel('F1-Score')
-        axes[0, 1].set_title('F1-Score Across Time Splits')
+        axes[0, 1].set_title('F1-Score Across Time Splits (Improved Model)')
         axes[0, 1].legend()
         axes[0, 1].grid(True, alpha=0.3)
         
@@ -340,7 +363,7 @@ class WalkForwardValidator:
         axes[1, 0].set_yticks(range(len(top_features)))
         axes[1, 0].set_yticklabels(top_features['feature'])
         axes[1, 0].set_xlabel('Feature Importance')
-        axes[1, 0].set_title('Top 15 Features')
+        axes[1, 0].set_title('Top 15 Features (Improved Model)')
         axes[1, 0].invert_yaxis()
         
         # Overfitting analysis
@@ -350,14 +373,15 @@ class WalkForwardValidator:
         axes[1, 1].plot(splits, train_val_gap, 'o-', label='Train-Val Gap', linewidth=2)
         axes[1, 1].plot(splits, val_test_gap, 's-', label='Val-Test Gap', linewidth=2)
         axes[1, 1].axhline(y=0, color='k', linestyle='--', alpha=0.5)
+        axes[1, 1].axhline(y=0.1, color='r', linestyle='--', alpha=0.5, label='Overfitting Threshold')
         axes[1, 1].set_xlabel('Split Number')
         axes[1, 1].set_ylabel('Accuracy Gap')
-        axes[1, 1].set_title('Overfitting Analysis')
+        axes[1, 1].set_title('Overfitting Analysis (Improved Model)')
         axes[1, 1].legend()
         axes[1, 1].grid(True, alpha=0.3)
         
         plt.tight_layout()
-        plt.savefig('visualizer/images/walk_forward_analysis.png', dpi=300, bbox_inches='tight')
+        plt.savefig('visualizer/images/improved_walk_forward_analysis.png', dpi=300, bbox_inches='tight')
         plt.show()
 
     def save_best_model(self, dataset_names):
@@ -373,17 +397,17 @@ class WalkForwardValidator:
         # Generate filename
         timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
         if len(dataset_names) == 1:
-            model_filename = f'walkforward_xgboost_{dataset_names[0]}_{timestamp}.pkl'
+            model_filename = f'improved_walkforward_xgboost_{dataset_names[0]}_{timestamp}.pkl'
         else:
             dataset_str = "_".join(dataset_names[:3])
             if len(dataset_names) > 3:
                 dataset_str += f"_plus{len(dataset_names)-3}more"
-            model_filename = f'walkforward_xgboost_combined_{dataset_str}_{timestamp}.pkl'
+            model_filename = f'improved_walkforward_xgboost_combined_{dataset_str}_{timestamp}.pkl'
         
         # Save model
         joblib.dump(best_model, f"models/{model_filename}")
         
-        print(f"\nModel saved:")
+        print(f"\nImproved Model saved:")
         print(f"  Filename: {model_filename}")
         print(f"  Best split: {best_split_idx + 1}")
         print(f"  Best validation accuracy: {val_accuracies[best_split_idx]:.4f}")
@@ -392,12 +416,18 @@ class WalkForwardValidator:
 
 
 def main(dataset_names=None, feature_columns=None, model_params=None):
-    """Run walk-forward validation on specified datasets."""
+    """Run improved walk-forward validation on specified datasets."""
     if dataset_names is None:
         dataset_names = ['OMXS30']
     
-    print("Walk-Forward Validation for Stock Prediction")
-    print("=" * 50)
+    print("Improved Walk-Forward Validation for Stock Prediction")
+    print("=" * 60)
+    print("🔧 This version fixes overfitting with:")
+    print("   - More conservative XGBoost parameters")
+    print("   - Early stopping with validation set")
+    print("   - Better regularization")
+    print("   - Controlled class weights")
+    print("=" * 60)
     
     validator = WalkForwardValidator()
     
@@ -408,7 +438,7 @@ def main(dataset_names=None, feature_columns=None, model_params=None):
     print(f"Combined dataset: {df.shape[0]} rows, {df.shape[1]} columns")
     print(f"Date range: {df['Date'].min()} to {df['Date'].max()}")
     
-    print("\nStarting walk-forward validation...")
+    print("\nStarting improved walk-forward validation...")
     results, feature_names = validator.run_validation(df, feature_columns, model_params)
     
     print("\nAnalyzing results...")
@@ -419,7 +449,7 @@ def main(dataset_names=None, feature_columns=None, model_params=None):
     
     # Final summary
     metrics = results['summary_metrics']
-    print(f"\nFinal Summary:")
+    print(f"\nFinal Summary (Improved Model):")
     print(f"  Test Accuracy: {np.mean(metrics['test_accuracy']):.4f} ± {np.std(metrics['test_accuracy']):.4f}")
     print(f"  Test F1-Score: {np.mean(metrics['test_f1']):.4f} ± {np.std(metrics['test_f1']):.4f}")
     print(f"  Total Splits: {len(results['splits'])}")
@@ -434,4 +464,4 @@ def main(dataset_names=None, feature_columns=None, model_params=None):
 
 
 if __name__ == "__main__":
-    results = main(["seb"])
+    results = main(["OMXS30"])

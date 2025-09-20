@@ -78,7 +78,7 @@ class PortfolioVisualizer:
         """
         if model_path is None:
             # Try to find XGBoost model
-            xgboost_files = [f for f in os.listdir("./models") if f.startswith("walkforward") and f.endswith(".pkl")]
+            xgboost_files = [f for f in os.listdir("./models") if f.startswith("improved") and f.endswith(".pkl")]
             
             if xgboost_files:
                 model_path = os.path.join("./models", sorted(xgboost_files)[-1])
@@ -513,7 +513,7 @@ def main():
     # print("📊 Comparing Benchmark vs Model Strategy Performance")
     
     # Initialize visualizer (defaults to OMXS30 as benchmark)
-    visualizer = PortfolioVisualizer(benchmark_stock="hmb")
+    visualizer = PortfolioVisualizer(benchmark_stock="investor")
     
     # Load data
     visualizer.load_data()
