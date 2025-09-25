@@ -163,15 +163,39 @@ def calculate_technical_indicators(df):
     # data['Price_change_20d'] = data['Close'] / data['Close'].shift(20) - 1
         
     #========================
-    # Målvariabelns definition
+    # Målvariabelns definition - Improved with percentile-based and volatility-adjusted thresholds
     #========================
-    threshold = 0.015
-    data['Future_Close_xd'] = data['Close'].shift(-5)
-    data['Return_xd'] = (data['Future_Close_xd'] - data['Close']) / data['Close']
-    data['Target'] = 1
-    data.loc[data['Return_xd'] > threshold, 'Target'] = 2
-    data.loc[data['Return_xd'] < -threshold, 'Target'] = 0
-    data = data.drop(['Future_Close_xd', "Return_xd"], axis=1)
+
+    # Calculate 5-day forward returns
+    data['Future_Close_5d'] = data['Close'].shift(-5)
+    data['Return_5d'] = (data['Future_Close_5d'] - data['Close']) / data['Close']
+
+    # Calculate rolling volatility (20-day rolling standard deviation of daily returns)
+    data['Rolling_volatility'] = data['Return_1d'].rolling(window=20).std()
+
+    # Calculate rolling percentiles for forward returns (using 252-day window ~ 1 year)
+    lookback_window = min(252, len(data) // 2)  # Ensure we don't exceed data length
+    data['Return_5d_p20'] = data['Return_5d'].rolling(window=lookback_window, min_periods=50).quantile(0.20)
+    data['Return_5d_p80'] = data['Return_5d'].rolling(window=lookback_window, min_periods=50).quantile(0.80)
+
+    # Volatility-adjusted thresholds: scale percentile thresholds by current volatility
+    # Higher volatility periods get higher thresholds
+    volatility_median = data['Rolling_volatility'].rolling(window=252, min_periods=50).median()
+    volatility_adjustment = (data['Rolling_volatility'] / volatility_median).fillna(1.0).clip(0.5, 2.0)
+
+    data['Threshold_sell'] = data['Return_5d_p20'] * volatility_adjustment
+    data['Threshold_buy'] = data['Return_5d_p80'] * volatility_adjustment
+
+    # Create target variable based on adaptive thresholds
+    data['Target'] = 1  # Default to hold
+    data.loc[data['Return_5d'] <= data['Threshold_sell'], 'Target'] = 0  # Sell
+    data.loc[data['Return_5d'] >= data['Threshold_buy'], 'Target'] = 2   # Buy
+
+    # Clean up intermediate columns
+    data = data.drop([
+        'Future_Close_5d', 'Return_5d', 'Rolling_volatility',
+        'Return_5d_p20', 'Return_5d_p80', 'Threshold_sell', 'Threshold_buy'
+    ], axis=1)
     
     # data['ATR_20'] = ta.volatility.average_true_range(data['High'], data['Low'], data['Close'], window=20)
     # data['Threshold'] = 0.7 * data['ATR_20'] / data['Close']

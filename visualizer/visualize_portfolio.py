@@ -540,7 +540,7 @@ def main():
     """
     print("\n"*5+"🚀 Starting Portfolio Visualization Tool")
 
-    visualizer = PortfolioVisualizer(benchmark_stock="OMXS30")
+    visualizer = PortfolioVisualizer(benchmark_stock="omxs30")
     
     visualizer.load_data()
     visualizer.calculate_benchmark_performance()
