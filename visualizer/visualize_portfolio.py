@@ -553,36 +553,6 @@ def main():
                 
     except Exception as e:
         print(f"\n⚠️ Could not load model or run model strategy: {str(e)}")
-        # print("📊 Falling back to benchmark analysis only...")
-        
-        # # Fallback to simple benchmark analysis
-        # metrics = visualizer.calculate_portfolio_metrics()
-        
-        # print("\n" + "="*80)
-        # print(f"{visualizer.benchmark_stock} BENCHMARK PERFORMANCE")
-        # print("="*80)
-        # print(f"Final Value: {metrics['benchmark']['final_value']:.2f}")
-        # print(f"Total Return: {metrics['benchmark']['total_return']:+.2f}%")
-        # print(f"Annualized Return: {metrics['benchmark']['annual_return']:+.2f}%")
-        # print("="*80)
-        
-        # # Create simple visualization
-        # fig, ax = plt.subplots(figsize=(12, 8))
-        # plt.plot(visualizer.portfolio_data['Date'], visualizer.portfolio_data['Benchmark_Return_Pct'], 
-        #         linewidth=3, label=f'{visualizer.benchmark_stock} Benchmark', color='#2E86AB')
-        # plt.axhline(y=0, color='black', linestyle='--', alpha=0.7, 
-        #            label='Break-even (0%)')
-        # plt.title(f'{visualizer.benchmark_stock} Returns Over Time (Benchmark Strategy)', fontsize=16, fontweight='bold')
-        # plt.xlabel('Date', fontsize=12)
-        # plt.ylabel('Return (%)', fontsize=12)
-        # plt.legend(fontsize=12)
-        # plt.grid(True, alpha=0.3)
-        # ax.yaxis.set_major_formatter(plt.FuncFormatter(lambda x, p: f'{x:.0f}%'))
-        # plt.tight_layout()
-        # plt.savefig('portfolio_value.png', dpi=300, bbox_inches='tight')
-        # plt.show()
-        
-        # print("📋 Check 'portfolio_value.png' for the chart")
 
 if __name__ == "__main__":
     main()
