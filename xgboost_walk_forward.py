@@ -7,11 +7,46 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import joblib
 import datetime
+from typing import Literal, List, Union, Optional
 from dateutil.relativedelta import relativedelta
 from progress.bar import Bar
 import warnings
 warnings.filterwarnings('ignore')
 
+Stocks = Literal[
+    "abb",
+    "addtech",
+    "alfa",
+    "assa",
+    "astrazeneca",
+    'atlascopco',
+    "boliden",
+    "epiroc",
+    "eqt",
+    "ericsson",
+    "essity",
+    "evolution",
+    "handelsbanken",
+    "hexagon",
+    "hmb",
+    "industrivarden",
+    "investor",
+    "lifco",
+    "nibe",
+    "nordea",
+    "saab",
+    "sandvik",
+    "sca",
+    "seb",
+    "skanska",
+    "skf",
+    "swedbank",
+    "tele2",
+    "telia",
+    "volvo",
+    
+    "OMXS30",
+]
 
 class WalkForwardValidator:
     """Walk-forward validation for time series classification with XGBoost."""
@@ -148,15 +183,16 @@ class WalkForwardValidator:
     def train_model(self, X_train, y_train, params=None):
         """Train XGBoost classifier with class balancing."""
         model_params = {
-            'n_estimators': 150,
-            'max_depth': 5,
+            'n_estimators': 100,
+            'max_depth': 4,
             'learning_rate': 0.1,
             'subsample': 0.8,
             'colsample_bytree': 0.8,
-            'min_child_weight': 80,
-            'reg_alpha': 0.5,
-            'reg_lambda': 2.0,
+            'min_child_weight': 20,
+            'reg_alpha': 0.3,
+            'reg_lambda': 1.5,
             'random_state': 42,
+            # 'early_stopping_rounds': 30,
             'n_jobs': -1,
             'eval_metric': 'mlogloss',
             'objective': 'multi:softprob',
@@ -372,13 +408,13 @@ class WalkForwardValidator:
         
         # Generate filename
         timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-        if len(dataset_names) == 1:
-            model_filename = f'walkforward_xgboost_{dataset_names[0]}_{timestamp}.pkl'
-        else:
-            dataset_str = "_".join(dataset_names[:3])
-            if len(dataset_names) > 3:
-                dataset_str += f"_plus{len(dataset_names)-3}more"
-            model_filename = f'walkforward_xgboost_combined_{dataset_str}_{timestamp}.pkl'
+        # if len(dataset_names) == 1:
+        model_filename = f'xgboost_{"_".join(dataset_names)}_{timestamp}.pkl'
+        # else:
+        #     dataset_str = "_".join(dataset_names[:3])
+        #     if len(dataset_names) > 3:
+        #         dataset_str += f"_plus{len(dataset_names)-3}more"
+        #     model_filename = f'walkforward_xgboost_combined_{dataset_str}_{timestamp}.pkl'
         
         # Save model
         joblib.dump(best_model, f"models/{model_filename}")
@@ -391,7 +427,10 @@ class WalkForwardValidator:
         return model_filename, best_model
 
 
-def main(dataset_names=None, feature_columns=None, model_params=None):
+def main(
+    dataset_names: Optional[Union[Stocks, List[Stocks]]] = None,
+    feature_columns=None, model_params=None
+):
     """Run walk-forward validation on specified datasets."""
     if dataset_names is None:
         dataset_names = ['OMXS30']
@@ -434,4 +473,35 @@ def main(dataset_names=None, feature_columns=None, model_params=None):
 
 
 if __name__ == "__main__":
-    results = main(["seb"])
+    results = main([
+        'abb',
+        'addtech',
+        'alfa',
+        'assa',
+        'astrazeneca',
+        'atlascopco',
+        'boliden',
+        'epiroc',
+        'eqt',
+        'ericsson',
+        'essity',
+        'evolution',
+        'handelsbanken',
+        'hexagon',
+        'hmb',
+        'industrivarden',
+        'investor',
+        'lifco',
+        'nibe',
+        'nordea',
+        'saab',
+        'sandvik',
+        'sca',
+        'seb',
+        'skanska',
+        'skf',
+        'swedbank',
+        'tele2',
+        'telia',
+        'volvo',
+    ])

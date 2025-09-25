@@ -1,3 +1,4 @@
+from typing import Literal, Optional
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -7,8 +8,29 @@ import joblib
 from sklearn.preprocessing import StandardScaler
 from prettytable import PrettyTable
 
+Stocks = Literal[
+    'atlascopco',
+    "electrolux",
+    "ericsson",
+    "getinge",
+    "handelsbanken",
+    "hmb",
+    "investor",
+    "nordea",
+    "OMXS30",
+    "sandvik",
+    "seb",
+    "skf",
+    "SP500",
+    "swedbank",
+    "telia",
+    "volvo"
+]
+
 class PortfolioVisualizer:
-    def __init__(self, data_path="./data", benchmark_stock="OMXS30"):
+    def __init__(self, data_path="./data",
+                 benchmark_stock: Optional[Stocks] = "OMXS30"
+                 ):
         """
         Initialize the portfolio visualizer with paths to processed data
         """
@@ -78,10 +100,17 @@ class PortfolioVisualizer:
         """
         if model_path is None:
             # Try to find XGBoost model
-            xgboost_files = [f for f in os.listdir("./models") if f.startswith("improved") and f.endswith(".pkl")]
+            xgboost_files = [f for f in os.listdir("./models") if f.endswith(".pkl")]
             
             if xgboost_files:
-                model_path = os.path.join("./models", sorted(xgboost_files)[-1])
+                xgboost_files_with_time = []
+                for f in xgboost_files:
+                    file_path = os.path.join("./models", f)
+                    mtime = os.path.getmtime(file_path)
+                    xgboost_files_with_time.append((f, mtime))
+                    
+                newest_file = sorted(xgboost_files_with_time, key=lambda x: x[1], reverse=True)[0][0]
+                model_path = os.path.join("./models", newest_file)
             else:
                 raise FileNotFoundError("No XGBoost model found in models/ directory")
         
@@ -99,7 +128,7 @@ class PortfolioVisualizer:
             "SMA5_trend", "SMA20_trend", "RSI_14", "RSI_7", "RSI_oversold", 
             "RSI_overbought", "RSI_neutral", "BB_width", "BB_position", "BB_squeeze",
             "Volume_ratio", "Volume_rank", "MACD_histogram", "MACD_normalized", 
-            "Rolling_Std_20", "Return_1d", "Return_5d", "Return_1d_lag1", 
+            "Rolling_Std_20", "Return_1d", "Return_3d", "Return_5d", "Return_1d_lag1", 
             "Return_3d_lag1", "Return_5d_lag1", "Volatility_5d", "Volatility_20d", 
             "Volatility_ratio", "Daily_range", "Gap", "Trend_strength"
         ]
@@ -177,9 +206,9 @@ class PortfolioVisualizer:
         portfolio_value = 100.0  # Start with value of 100
         in_market = False  # Track if we're in the market or in cash
         model_values = []
-        
-        # Get benchmark stock values for reference
-        benchmark_values = self.portfolio_data['Benchmark_normalized'].values
+
+        # Get actual stock prices for calculating daily returns
+        stock_prices = portfolio_with_signals['Close'].values
         
         # Debug tracking
         trades = []
@@ -188,42 +217,42 @@ class PortfolioVisualizer:
         for i, row in portfolio_with_signals.iterrows():
             current_signal = row['Signal']
             date = row['Date']
-            
+
             if pd.isna(current_signal):
                 current_signal = 1  # Default to hold position
-            
+
+            # Update portfolio value FIRST based on current position
+            if in_market:
+                # If in market, apply daily stock price changes
+                if i > 0 and not pd.isna(stock_prices[i]) and not pd.isna(stock_prices[i-1]) and stock_prices[i-1] != 0:
+                    daily_return = stock_prices[i] / stock_prices[i-1]
+                    portfolio_value = portfolio_value * daily_return
+            # If in cash (not in_market), portfolio_value stays the same
+
             trade_executed = False
             trade_type = "none"
-            
-            # Trading logic based on 3-class signal
+
+            # Then execute trades based on signals for NEXT period
             if current_signal == 2:  # Buy signal
                 if not in_market:
                     # Move from cash to market - start tracking market performance
                     in_market = True
                     trade_executed = True
                     trade_type = "buy"
-                    
+
                     if debug and len(trades) < 20:  # Show first 20 trades for debugging
                         print(f"{date.strftime('%Y-%m-%d')}: BUY - Moved to market at {portfolio_value:.2f}")
-                    
+
             elif current_signal == 0:  # Sell signal
                 if in_market:
                     # Move from market to cash - stop tracking market performance
                     in_market = False
                     trade_executed = True
                     trade_type = "sell"
-                    
+
                     if debug and len(trades) < 20:  # Show first 20 trades for debugging
                         print(f"{date.strftime('%Y-%m-%d')}: SELL - Moved to cash at {portfolio_value:.2f}")
-            
-            # Update portfolio value based on position
-            if in_market:
-                # If in market, follow the benchmark performance
-                if i > 0:
-                    daily_return = benchmark_values[i] / benchmark_values[i-1]
-                    portfolio_value = portfolio_value * daily_return
-            # If in cash (not in_market), portfolio_value stays the same
-            
+
             model_values.append(portfolio_value)
             
             if trade_executed:
@@ -510,15 +539,10 @@ def main():
     Main function to run the portfolio visualization with model comparison
     """
     print("\n"*5+"🚀 Starting Portfolio Visualization Tool")
-    # print("📊 Comparing Benchmark vs Model Strategy Performance")
+
+    visualizer = PortfolioVisualizer(benchmark_stock="OMXS30")
     
-    # Initialize visualizer (defaults to OMXS30 as benchmark)
-    visualizer = PortfolioVisualizer(benchmark_stock="investor")
-    
-    # Load data
     visualizer.load_data()
-    
-    # Calculate benchmark performance
     visualizer.calculate_benchmark_performance()
     
     try:

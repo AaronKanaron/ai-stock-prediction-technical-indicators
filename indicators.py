@@ -165,21 +165,21 @@ def calculate_technical_indicators(df):
     #========================
     # Målvariabelns definition
     #========================
-    # threshold = 0.015 
+    threshold = 0.015
+    data['Future_Close_xd'] = data['Close'].shift(-5)
+    data['Return_xd'] = (data['Future_Close_xd'] - data['Close']) / data['Close']
+    data['Target'] = 1
+    data.loc[data['Return_xd'] > threshold, 'Target'] = 2
+    data.loc[data['Return_xd'] < -threshold, 'Target'] = 0
+    data = data.drop(['Future_Close_xd', "Return_xd"], axis=1)
+    
+    # data['ATR_20'] = ta.volatility.average_true_range(data['High'], data['Low'], data['Close'], window=20)
+    # data['Threshold'] = 0.7 * data['ATR_20'] / data['Close']
     # data['Future_Close_3d'] = data['Close'].shift(-3)
     # data['Return_3d'] = (data['Future_Close_3d'] - data['Close']) / data['Close']
-    # data['Target'] = 1
-    # data.loc[data['Return_3d'] > threshold, 'Target'] = 2
-    # data.loc[data['Return_3d'] < -threshold, 'Target'] = 0
-    # data = data.drop(['Future_Close_3d', 'Return_3d'], axis=1)
-    
-    data['ATR_20'] = ta.volatility.average_true_range(data['High'], data['Low'], data['Close'], window=20)
-    data['Threshold'] = 0.7 * data['ATR_20'] / data['Close']
-    data['Future_Close_3d'] = data['Close'].shift(-3)
-    data['Return_3d'] = (data['Future_Close_3d'] - data['Close']) / data['Close']
-    data['Target'] = np.where(data['Return_3d'] > data['Threshold'], 2,
-                 np.where(data['Return_3d'] < -data['Threshold'], 0, 1))
-    data = data.drop(['Future_Close_3d', 'Return_3d', 'ATR_20', 'Threshold'], axis=1)
+    # data['Target'] = np.where(data['Return_3d'] > data['Threshold'], 2,
+    #              np.where(data['Return_3d'] < -data['Threshold'], 0, 1))
+    # data = data.drop(['Future_Close_3d', 'Return_3d', 'ATR_20', 'Threshold'], axis=1)
     
     #========================
     
@@ -253,22 +253,37 @@ def main():
     data_dir = "data"
     
     files_to_process = [
+        ("abb_rawdata.csv", "abb.csv"),
+        ("addtech_rawdata.csv", "addtech.csv"),
+        ("alfa_rawdata.csv", "alfa.csv"),
+        ("assa_rawdata.csv", "assa.csv"),
+        ("astrazeneca_rawdata.csv", "astrazeneca.csv"),
         ("atlascopco_rawdata.csv", "atlascopco.csv"),
-        ("electrolux_rawdata.csv", "electrolux.csv"),
+        ("boliden_rawdata.csv", "boliden.csv"),
+        ("epiroc_rawdata.csv", "epiroc.csv"),
+        ("eqt_rawdata.csv", "eqt.csv"),
         ("ericsson_rawdata.csv", "ericsson.csv"),
-        ("getinge_rawdata.csv", "getinge.csv"),
+        ("essity_rawdata.csv", "essity.csv"),
+        ("evolution_rawdata.csv", "evolution.csv"),
         ("handelsbanken_rawdata.csv", "handelsbanken.csv"),
+        ("hexagon_rawdata.csv", "hexagon.csv"),
         ("hmb_rawdata.csv", "hmb.csv"),
+        ("industrivarden_rawdata.csv", "industrivarden.csv"),
         ("investor_rawdata.csv", "investor.csv"),
+        ("lifco_rawdata.csv", "lifco.csv"),
+        ("nibe_rawdata.csv", "nibe.csv"),
         ("nordea_rawdata.csv", "nordea.csv"),
+        ("OMXS30_rawdata.csv", "OMXS30.csv"),
+        ("saab_rawdata.csv", "saab.csv"),
         ("sandvik_rawdata.csv", "sandvik.csv"),
+        ("sca_rawdata.csv", "sca.csv"),
         ("seb_rawdata.csv", "seb.csv"),
+        ("skanska_rawdata.csv", "skanska.csv"),
         ("skf_rawdata.csv", "skf.csv"),
         ("swedbank_rawdata.csv", "swedbank.csv"),
+        ("tele2_rawdata.csv", "tele2.csv"),
         ("telia_rawdata.csv", "telia.csv"),
         ("volvo_rawdata.csv", "volvo.csv"),
-        ("OMXS30_rawdata.csv", "OMXS30.csv"),
-        ("SP500_rawdata.csv", "SP500.csv")
     ]
     
     # Ensure data directory exists

@@ -140,14 +140,14 @@ class WalkForwardValidator:
         """Train XGBoost classifier with proper regularization to prevent overfitting."""
         model_params = {
             # FIXED: Much more conservative parameters to prevent overfitting
-            'n_estimators': 50,          # Reduced from 150
+            'n_estimators': 100,          # Reduced from 150
             'max_depth': 3,              # Reduced from 5  
-            'learning_rate': 0.05,       # Reduced from 0.1
+            'learning_rate': 0.1,       # Reduced from 0.1
             'subsample': 0.7,            # Reduced from 0.8
             'colsample_bytree': 0.7,     # Reduced from 0.8
             'min_child_weight': 100,     # Increased from 80
-            'reg_alpha': 2.0,            # Increased from 0.5
-            'reg_lambda': 5.0,           # Increased from 2.0
+            'reg_alpha': 0.5,            # Increased from 0.5
+            'reg_lambda': 2.0,           # Increased from 2.0
             'random_state': 42,
             'n_jobs': -1,
             'eval_metric': 'mlogloss',
