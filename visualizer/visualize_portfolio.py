@@ -29,13 +29,20 @@ Stocks = Literal[
 
 class PortfolioVisualizer:
     def __init__(self, data_path="./data",
-                 benchmark_stock: Optional[Stocks] = "OMXS30"
+                 benchmark_stock: Optional[Stocks] = "OMXS30",
+                 transaction_fee: float = 0.01
                  ):
         """
         Initialize the portfolio visualizer with paths to processed data
+
+        Args:
+            data_path: Path to data directory
+            benchmark_stock: Stock to use as benchmark
+            transaction_fee: Transaction fee as percentage (0.01 = 1%)
         """
         self.data_path = data_path
         self.benchmark_stock = benchmark_stock
+        self.transaction_fee = transaction_fee
         self.benchmark_data = None
         self.portfolio_data = None
         
@@ -79,19 +86,29 @@ class PortfolioVisualizer:
         Calculate buy-and-hold benchmark performance for single stock
         """
         print(f"Calculating benchmark performance for {self.benchmark_stock}")
-        
+
         # Calculate normalized returns (starting from 100)
         portfolio_data = self.benchmark_data[['Date', 'Close']].copy()
-        portfolio_data['Benchmark_normalized'] = (portfolio_data['Close'] / portfolio_data['Close'].iloc[0]) * 100
-        
+        initial_value = 100.0
+
+        # Apply transaction fee for initial purchase (buy-and-hold has 1 buy transaction)
+        transaction_fee_amount = initial_value * self.transaction_fee
+        value_after_fee = initial_value - transaction_fee_amount
+
+        # Calculate normalized returns accounting for initial transaction fee
+        portfolio_data['Benchmark_normalized'] = (portfolio_data['Close'] / portfolio_data['Close'].iloc[0]) * value_after_fee
+
         # Calculate percentage returns
         portfolio_data['Benchmark_Return_Pct'] = portfolio_data['Benchmark_normalized'] - 100
-        
+
         # Calculate daily returns for volatility
         portfolio_data['Daily_Return'] = portfolio_data['Benchmark_normalized'].pct_change() * 100
-        
+
+        # Track total fees paid (just one buy transaction for buy-and-hold)
+        self.benchmark_total_fees = transaction_fee_amount
+
         self.portfolio_data = portfolio_data
-        
+
         return portfolio_data
     
     def load_model(self, model_path=None):
@@ -175,19 +192,19 @@ class PortfolioVisualizer:
         """
         if self.portfolio_data is None:
             raise ValueError("Portfolio data not calculated. Run calculate_benchmark_performance first.")
-        
+
         if not hasattr(self, 'model'):
             raise ValueError("Model not loaded. Run load_model first.")
-        
-        print("Simulating model-based trading strategy...")
-        
+
+        print(f"Simulating model-based trading strategy (Transaction fee: {self.transaction_fee*100:.1f}%)...")
+
         # Generate predictions for the benchmark stock
         benchmark_signals = self.generate_model_predictions(self.benchmark_data, self.model)
-        
+
         if benchmark_signals is None:
             print("Could not generate model predictions")
             return None
-        
+
         # Merge signals with portfolio data
         portfolio_with_signals = pd.merge(
             self.portfolio_data[['Date', 'Close']],
@@ -195,24 +212,44 @@ class PortfolioVisualizer:
             on='Date',
             how='left'
         )
-        
+
         # Forward fill signals for missing dates
         portfolio_with_signals['Signal'] = portfolio_with_signals['Signal'].ffill()
         portfolio_with_signals['Prob_Sell'] = portfolio_with_signals['Prob_Sell'].ffill()
         portfolio_with_signals['Prob_Hold'] = portfolio_with_signals['Prob_Hold'].ffill()
         portfolio_with_signals['Prob_Buy'] = portfolio_with_signals['Prob_Buy'].ffill()
-        
+
+        # Simulate both with and without fees for comparison
+        # First simulate without fees
+        no_fee_result = self._simulate_strategy_core(portfolio_with_signals, apply_fees=False, debug=debug)
+
+        # Then simulate with fees
+        with_fee_result = self._simulate_strategy_core(portfolio_with_signals, apply_fees=True, debug=debug)
+
+        # Store results
+        self.model_portfolio_data = with_fee_result['portfolio_data']
+        self.model_trades_data = with_fee_result['trades_data']
+        self.model_total_fees = with_fee_result['total_fees']
+        self.model_no_fee_return = no_fee_result['final_return']
+        self.model_with_fee_return = with_fee_result['final_return']
+
+        return self.model_portfolio_data
+
+    def _simulate_strategy_core(self, portfolio_with_signals, apply_fees=True, debug=False):
+        """
+        Core simulation logic for trading strategy
+        """
         # Initialize model portfolio tracking (normalized to 100 at start)
         portfolio_value = 100.0  # Start with value of 100
         in_market = False  # Track if we're in the market or in cash
         model_values = []
+        total_fees_paid = 0.0  # Track total transaction fees
 
         # Get actual stock prices for calculating daily returns
         stock_prices = portfolio_with_signals['Close'].values
-        
+
         # Debug tracking
         trades = []
-        prev_signal = None
         
         for i, row in portfolio_with_signals.iterrows():
             current_signal = row['Signal']
@@ -235,23 +272,41 @@ class PortfolioVisualizer:
             # Then execute trades based on signals for NEXT period
             if current_signal == 2:  # Buy signal
                 if not in_market:
+                    if apply_fees:
+                        # Apply transaction fee for buying (fee on the transaction amount)
+                        fee_amount = portfolio_value * self.transaction_fee
+                        portfolio_value -= fee_amount
+                        total_fees_paid += fee_amount
+                    else:
+                        fee_amount = 0.0
+
                     # Move from cash to market - start tracking market performance
                     in_market = True
                     trade_executed = True
                     trade_type = "buy"
 
                     if debug and len(trades) < 20:  # Show first 20 trades for debugging
-                        print(f"{date.strftime('%Y-%m-%d')}: BUY - Moved to market at {portfolio_value:.2f}")
+                        fee_text = f", Fee: {fee_amount:.2f}" if apply_fees else ""
+                        print(f"{date.strftime('%Y-%m-%d')}: BUY - Value: {portfolio_value:.2f}{fee_text}")
 
             elif current_signal == 0:  # Sell signal
                 if in_market:
+                    if apply_fees:
+                        # Apply transaction fee for selling (fee on the transaction amount)
+                        fee_amount = portfolio_value * self.transaction_fee
+                        portfolio_value -= fee_amount
+                        total_fees_paid += fee_amount
+                    else:
+                        fee_amount = 0.0
+
                     # Move from market to cash - stop tracking market performance
                     in_market = False
                     trade_executed = True
                     trade_type = "sell"
 
                     if debug and len(trades) < 20:  # Show first 20 trades for debugging
-                        print(f"{date.strftime('%Y-%m-%d')}: SELL - Moved to cash at {portfolio_value:.2f}")
+                        fee_text = f", Fee: {fee_amount:.2f}" if apply_fees else ""
+                        print(f"{date.strftime('%Y-%m-%d')}: SELL - Value: {portfolio_value:.2f}{fee_text}")
 
             model_values.append(portfolio_value)
             
@@ -263,42 +318,47 @@ class PortfolioVisualizer:
                     'portfolio_value': portfolio_value
                 })
             
-            prev_signal = current_signal
         
         # Add model results to portfolio data
-        portfolio_with_signals['Model_normalized'] = model_values
-        portfolio_with_signals['Model_Return_Pct'] = np.array(model_values) - 100
-        
+        portfolio_with_signals_copy = portfolio_with_signals.copy()
+        portfolio_with_signals_copy['Model_normalized'] = model_values
+        portfolio_with_signals_copy['Model_Return_Pct'] = np.array(model_values) - 100
+
         # Create a separate dataframe for actual trades only
         trades_df = pd.DataFrame(trades) if trades else pd.DataFrame()
-        
-        self.model_portfolio_data = portfolio_with_signals
-        self.model_trades_data = trades_df  # Store actual trades separately
-        
+
+        final_return = model_values[-1] - 100 if model_values else 0.0
+
         # Print debugging info
         if debug:
             print(f"\n🔍 TRADING ANALYSIS:")
             print(f"  Total trades executed: {len(trades)}")
+            print(f"  Total transaction fees paid: {total_fees_paid:.2f}")
             if trades:
                 buy_trades = [t for t in trades if t['type'] == 'buy']
                 sell_trades = [t for t in trades if t['type'] == 'sell']
                 print(f"    - Buy trades: {len(buy_trades)}")
                 print(f"    - Sell trades: {len(sell_trades)}")
             print(f"  Signal changes (total): {(portfolio_with_signals['Signal'] != portfolio_with_signals['Signal'].shift()).sum()}")
-            
+
             print(f"\n📊 SIGNAL DISTRIBUTION:")
             signal_counts = portfolio_with_signals['Signal'].value_counts().sort_index()
             for signal, count in signal_counts.items():
                 signal_name = {0: 'Sell', 1: 'Hold', 2: 'Buy'}.get(signal, 'Unknown')
                 print(f"  {signal_name} ({signal}): {count} days ({count/len(portfolio_with_signals)*100:.1f}%)")
-                
+
             # Show first few trades for verification
             if trades:
                 print(f"\n💰 FIRST 10 ACTUAL TRADES:")
                 for i, trade in enumerate(trades[:10]):
                     print(f"  {i+1}. {trade['date'].strftime('%Y-%m-%d')}: {trade['type'].upper()} (Signal: {trade['signal']}) - Portfolio: {trade['portfolio_value']:.2f}")
-        
-        return portfolio_with_signals
+
+        return {
+            'portfolio_data': portfolio_with_signals_copy,
+            'trades_data': trades_df,
+            'total_fees': total_fees_paid,
+            'final_return': final_return
+        }
     
     def calculate_portfolio_metrics(self):
         """
@@ -380,7 +440,7 @@ class PortfolioVisualizer:
         ax1.grid(True, alpha=0.3)
         
         # Format y-axis as percentage
-        ax1.yaxis.set_major_formatter(plt.FuncFormatter(lambda x, p: f'{x:.0f}%'))
+        ax1.yaxis.set_major_formatter(plt.FuncFormatter(lambda x, _: f'{x:.0f}%'))
         
         # Plot 2: Model Trading Signals (Actual Trades Only)
         if hasattr(self, 'model_portfolio_data') and hasattr(self, 'model_trades_data'):
@@ -492,28 +552,38 @@ class PortfolioVisualizer:
         print(f"{'  Days in market (Hold+Buy):':<{label_width}} {((signals == 1)|(signals == 2)).mean()*100:>{num_width}.1f}%")
         print(f"{'  Days holding cash (Sell):':<{label_width}} {(signals == 0).mean()*100:>{num_width}.1f}%")
 
-        table = PrettyTable(["Strategy", "Total Return", "Annual Return", "Difference (%p)", "Difference (%)"])
+        # Calculate fee loss percentages (what percentage of return was lost to fees)
+        benchmark_fee_loss_pct = (self.benchmark_total_fees / 100.0) * 100  # Simple: fee amount as % of initial investment
+
+        # For model strategy: compare return without fees vs with fees
+        if hasattr(self, 'model_no_fee_return') and hasattr(self, 'model_with_fee_return'):
+            fee_impact = self.model_no_fee_return - self.model_with_fee_return
+            model_fee_loss_pct = (fee_impact / 100.0) * 100  # Fee impact as % of initial investment
+        else:
+            model_fee_loss_pct = (self.model_total_fees / 100.0) * 100  # Fallback to simple calculation
+
+        table = PrettyTable(["Strategy", "Total Return", "Annual Return", "Fee Loss %", "Difference (%p)", "Difference (%)"])
         table.add_row([
             "Benchmark",
-            # f"{benchmark_metrics['benchmark']['final_value']:.2f}",
             f"{benchmark_metrics['benchmark']['total_return']:.2f}%",
             f"{benchmark_metrics['benchmark']['annual_return']:.2f}%",
+            f"{benchmark_fee_loss_pct:.2f}%",
             f"{benchmark_metrics['benchmark']['total_return'] - model_total_return:.2f}%",
             f"{(benchmark_metrics['benchmark']['total_return'] - model_total_return)/abs(benchmark_metrics['benchmark']['total_return'])*100 if benchmark_metrics['benchmark']['total_return'] != 0 else 0:.2f}%"
         ])
         table.add_row([
             "Model Strategy",
-            # f"{model_final_value:.2f}",
             f"{model_total_return:.2f}%",
             f"{model_annual_return:.2f}%",
+            f"{model_fee_loss_pct:.2f}%",
             f"{model_total_return - benchmark_metrics['benchmark']['total_return']:.2f}%",
             f"{(model_total_return - benchmark_metrics['benchmark']['total_return'])/abs(benchmark_metrics['benchmark']['total_return'])*100 if benchmark_metrics['benchmark']['total_return'] != 0 else 0:.2f}%"
         ])
         
         table.align["Strategy"] = "l"
-        # table.align["Final Value"] = "r"
         table.align["Total Return"] = "r"
         table.align["Annual Return"] = "r"
+        table.align["Fee Loss %"] = "r"
         table.align["Difference (%p)"] = "r"
         table.align["Difference (%)"] = "r"
 
@@ -540,7 +610,7 @@ def main():
     """
     print("\n"*5+"🚀 Starting Portfolio Visualization Tool")
 
-    visualizer = PortfolioVisualizer(benchmark_stock="omxs30")
+    visualizer = PortfolioVisualizer(benchmark_stock="omxs30", transaction_fee=0.001)
     
     visualizer.load_data()
     visualizer.calculate_benchmark_performance()
