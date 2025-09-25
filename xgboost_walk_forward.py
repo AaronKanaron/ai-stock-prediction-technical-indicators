@@ -50,134 +50,131 @@ Stocks = Literal[
 
 class WalkForwardValidator:
     """Walk-forward validation for time series classification with XGBoost."""
-    
+
     def __init__(self, initial_months=24, validation_months=3, test_months=3, step_months=6):
+        """Initialize validator with time split parameters.
+
+        Args:
+            initial_months: Initial training period in months
+            validation_months: Validation period in months
+            test_months: Test period in months
+            step_months: Step size for walk-forward in months
+        """
         self.initial_months = initial_months
-        self.validation_months = validation_months 
+        self.validation_months = validation_months
         self.test_months = test_months
         self.step_months = step_months
         self.results = None
 
     def load_datasets(self, dataset_names):
-        # """Load and combine multiple datasets."""
-        # if isinstance(dataset_names, str):
-        #     dataset_names = [dataset_names]
-            
-        # dataframes = []
-        # for name in dataset_names:
-        #     df = pd.read_csv(f'data/{name}.csv')
-        #     df['dataset_source'] = name
-        #     dataframes.append(df)
-            
-        # combined_df = pd.concat(dataframes, ignore_index=True)
-        # return combined_df
         """Load and combine multiple datasets."""
         if isinstance(dataset_names, str):
             dataset_names = [dataset_names]
-            
-        # Sort dataset names to ensure consistent processing order
+
         sorted_dataset_names = sorted(dataset_names)
-        
         dataframes = []
+
         for i, name in enumerate(sorted_dataset_names):
             df = pd.read_csv(f'data/{name}.csv')
             df['dataset_source'] = name
-            
-            # Add microseconds to date to avoid duplicate date conflicts
-            # Use consistent ordering based on alphabetical sort
             df['Date'] = pd.to_datetime(df['Date']) + pd.Timedelta(microseconds=i)
-            
             dataframes.append(df)
-            
-        combined_df = pd.concat(dataframes, ignore_index=True)
-        return combined_df
+
+        return pd.concat(dataframes, ignore_index=True)
 
     def prepare_features(self, df, feature_columns=None, exclude_columns=None):
-        """Prepare feature matrix and target vector."""
+        """Prepare feature matrix and target vector.
+
+        Args:
+            df: DataFrame with features and target
+            feature_columns: Specific columns to use as features
+            exclude_columns: Columns to exclude from features
+
+        Returns:
+            tuple: (X, y) feature matrix and target vector
+        """
         if exclude_columns is None:
             exclude_columns = ['Date', 'Target', 'dataset_source']
-        
-        if feature_columns is not None:
-            X = df[feature_columns]
-        else:
-            X = df.drop(columns=exclude_columns)
-        
+
+        X = df[feature_columns] if feature_columns else df.drop(columns=exclude_columns)
         y = df['Target']
-        
+
         # Remove rows with missing values
         valid_mask = ~(X.isna().any(axis=1) | y.isna())
-        X = X[valid_mask]
-        y = y[valid_mask]
-        
-        return X, y
+        return X[valid_mask], y[valid_mask]
 
     def compute_class_weights(self, y):
-        """Compute balanced class weights."""
+        """Compute balanced class weights for handling class imbalance.
+
+        Args:
+            y: Target vector
+
+        Returns:
+            dict: Class weights mapping
+        """
         class_counts = y.value_counts().sort_index()
         total_samples = len(y)
         n_classes = len(class_counts)
-        
-        weights = {}
-        for class_label in class_counts.index:
-            weights[class_label] = total_samples / (n_classes * class_counts[class_label])
-        
-        return weights
+
+        return {
+            class_label: total_samples / (n_classes * class_counts[class_label])
+            for class_label in class_counts.index
+        }
 
     def create_time_splits(self, df):
-        """Create chronological walk-forward splits."""
+        """Create chronological walk-forward splits.
+
+        Args:
+            df: DataFrame with Date column
+
+        Returns:
+            list: Time split configurations
+        """
+        df = df.copy()
         df['Date'] = pd.to_datetime(df['Date'])
         df = df.sort_values('Date').reset_index(drop=True)
-        
+
         start_date = df['Date'].min()
         end_date = df['Date'].max()
-        
         splits = []
-        first_val_start = start_date + relativedelta(months=self.initial_months)
-        current_val_start = first_val_start
+
+        current_val_start = start_date + relativedelta(months=self.initial_months)
         split_num = 1
-        
-        while True:
+
+        while split_num <= 50:  # Safety limit
+            # Calculate split periods
             val_end = current_val_start + relativedelta(months=self.validation_months)
             test_start = val_end
             test_end = test_start + relativedelta(months=self.test_months)
-            
+
             if test_end > end_date:
                 break
-                
-            train_start = start_date
-            train_end = current_val_start
-            
-            # Create data splits
-            train_mask = (df['Date'] >= train_start) & (df['Date'] < train_end)
+
+            # Create data masks
+            train_mask = (df['Date'] >= start_date) & (df['Date'] < current_val_start)
             val_mask = (df['Date'] >= current_val_start) & (df['Date'] < val_end)
             test_mask = (df['Date'] >= test_start) & (df['Date'] < test_end)
-            
+
+            # Extract data splits
             train_data = df[train_mask].copy()
             val_data = df[val_mask].copy()
             test_data = df[test_mask].copy()
-            
-            # Only include splits with sufficient data
+
+            # Check minimum data requirements
             if len(train_data) >= 200 and len(val_data) >= 30 and len(test_data) >= 30:
                 splits.append({
                     'split_id': split_num,
                     'periods': {
-                        'train': (train_start, train_end),
+                        'train': (start_date, current_val_start),
                         'val': (current_val_start, val_end),
                         'test': (test_start, test_end)
                     },
-                    'data': {
-                        'train': train_data,
-                        'val': val_data,
-                        'test': test_data
-                    }
+                    'data': {'train': train_data, 'val': val_data, 'test': test_data}
                 })
                 split_num += 1
-            
+
             current_val_start += relativedelta(months=self.step_months)
-            
-            if split_num > 50:  # Safety limit
-                break
-        
+
         return splits
 
     def train_model(self, X_train, y_train, params=None):
@@ -192,7 +189,6 @@ class WalkForwardValidator:
             'reg_alpha': 0.3,
             'reg_lambda': 1.5,
             'random_state': 42,
-            # 'early_stopping_rounds': 30,
             'n_jobs': -1,
             'eval_metric': 'mlogloss',
             'objective': 'multi:softprob',
@@ -333,7 +329,7 @@ class WalkForwardValidator:
 
     def _create_plots(self, feature_names):
         """Create analysis plots."""
-        fig, axes = plt.subplots(2, 2, figsize=(15, 12))
+        _, axes = plt.subplots(2, 2, figsize=(15, 12))
         
         metrics = self.results['summary_metrics']
         splits = [s['split_id'] for s in self.results['splits']]
@@ -397,33 +393,31 @@ class WalkForwardValidator:
         plt.show()
 
     def save_best_model(self, dataset_names):
-        """Save the best performing model."""
+        """Save the best performing model based on validation accuracy.
+
+        Args:
+            dataset_names: List of dataset names for filename
+
+        Returns:
+            tuple: (model_filename, best_model)
+        """
         if self.results is None:
             raise ValueError("No results available. Run validation first.")
-        
+
         # Find best model based on validation accuracy
         val_accuracies = self.results['summary_metrics']['val_accuracy']
         best_split_idx = np.argmax(val_accuracies)
         best_model = self.results['models'][best_split_idx]
-        
-        # Generate filename
+
+        # Generate filename and save
         timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-        # if len(dataset_names) == 1:
         model_filename = f'xgboost_{"_".join(dataset_names)}_{timestamp}.pkl'
-        # else:
-        #     dataset_str = "_".join(dataset_names[:3])
-        #     if len(dataset_names) > 3:
-        #         dataset_str += f"_plus{len(dataset_names)-3}more"
-        #     model_filename = f'walkforward_xgboost_combined_{dataset_str}_{timestamp}.pkl'
-        
-        # Save model
         joblib.dump(best_model, f"models/{model_filename}")
-        
-        print(f"\nModel saved:")
-        print(f"  Filename: {model_filename}")
+
+        print(f"\nModel saved: {model_filename}")
         print(f"  Best split: {best_split_idx + 1}")
         print(f"  Best validation accuracy: {val_accuracies[best_split_idx]:.4f}")
-        
+
         return model_filename, best_model
 
 
@@ -437,23 +431,18 @@ def main(
     
     print("Walk-Forward Validation for Stock Prediction")
     print("=" * 50)
-    
+
     validator = WalkForwardValidator()
-    
     print(f"Using datasets: {', '.join(dataset_names)}")
-    
-    # Load and combine datasets
+
+    # Load and process data
     df = validator.load_datasets(dataset_names)
     print(f"Combined dataset: {df.shape[0]} rows, {df.shape[1]} columns")
     print(f"Date range: {df['Date'].min()} to {df['Date'].max()}")
-    
-    print("\nStarting walk-forward validation...")
+
+    # Run validation pipeline
     results, feature_names = validator.run_validation(df, feature_columns, model_params)
-    
-    print("\nAnalyzing results...")
     importance_df = validator.analyze_results(feature_names)
-    
-    print("\nSaving best model...")
     model_filename, best_model = validator.save_best_model(dataset_names)
     
     # Final summary
