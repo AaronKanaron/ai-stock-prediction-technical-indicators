@@ -9,28 +9,45 @@ from sklearn.preprocessing import StandardScaler
 from prettytable import PrettyTable
 
 Stocks = Literal[
+    "abb",
+    "addtech",
+    "alfa",
+    "assa",
+    "astrazeneca",
     'atlascopco',
-    "electrolux",
+    "boliden",
+    "epiroc",
+    "eqt",
     "ericsson",
-    "getinge",
+    "essity",
+    "evolution",
     "handelsbanken",
+    "hexagon",
     "hmb",
+    "industrivarden",
     "investor",
+    "lifco",
+    "nibe",
     "nordea",
-    "OMXS30",
+    "saab",
     "sandvik",
+    "sca",
     "seb",
+    "skanska",
     "skf",
-    "SP500",
     "swedbank",
+    "tele2",
     "telia",
-    "volvo"
+    "volvo",
+    
+    "OMXS30",
 ]
+
 
 class PortfolioVisualizer:
     def __init__(self, data_path="./data",
                  benchmark_stock: Optional[Stocks] = "OMXS30",
-                 transaction_fee: float = 0.01
+                 transaction_fee: float = 0.001
                  ):
         """
         Initialize the portfolio visualizer with paths to processed data
@@ -38,7 +55,7 @@ class PortfolioVisualizer:
         Args:
             data_path: Path to data directory
             benchmark_stock: Stock to use as benchmark
-            transaction_fee: Transaction fee as percentage (0.01 = 1%)
+            transaction_fee: Transaction fee as percentage (0.001 = 0.1%)
         """
         self.data_path = data_path
         self.benchmark_stock = benchmark_stock
@@ -137,31 +154,47 @@ class PortfolioVisualizer:
     
     def generate_model_predictions(self, data, model):
         """
-        Generate model predictions for trading signals using pre-calculated indicators
+        Generate model predictions for trading signals using pre-calculated indicators.
+        Automatically detects the features the model expects.
         """
-        # Updated model features that match your new training data
-        model_features = [
-            "Price_vs_SMA5", "Price_vs_SMA10", "Price_vs_SMA20", "Price_vs_SMA50",
-            "SMA5_trend", "SMA20_trend", "RSI_14", "RSI_7", "RSI_oversold", 
-            "RSI_overbought", "RSI_neutral", "BB_width", "BB_position", "BB_squeeze",
-            "Volume_ratio", "Volume_rank", "MACD_histogram", "MACD_normalized", 
-            "Rolling_Std_20", "Return_1d", "Return_3d", "Return_5d", "Return_1d_lag1", 
-            "Return_3d_lag1", "Return_5d_lag1", "Volatility_5d", "Volatility_20d", 
-            "Volatility_ratio", "Daily_range", "Gap", "Trend_strength"
-        ]
-        
+        # Try to get feature names from the model
+        model_features = None
+
+        # Try different ways to get feature names from the model
+        if hasattr(model, 'feature_names_in_'):
+            # Sklearn models store feature names here
+            model_features = list(model.feature_names_in_)
+        elif hasattr(model, 'get_booster') and hasattr(model.get_booster(), 'feature_names'):
+            # XGBoost models
+            model_features = model.get_booster().feature_names
+        elif hasattr(model, 'feature_name_'):
+            # LightGBM models
+            model_features = model.feature_name_
+        else:
+            # Fallback to all available features (minus excluded ones)
+            print("Warning: Could not detect model feature names. Using all available features.")
+            exclude_columns = ['Date', 'Target', 'dataset_source', 'Close']
+            model_features = [col for col in data.columns if col not in exclude_columns]
+
+        if model_features is None or len(model_features) == 0:
+            print("Error: Could not determine model features")
+            return None
+
+        print(f"Model expects {len(model_features)} features: {model_features[:5]}...")
+
         # Check which features are actually available in the data
         available_features = [f for f in model_features if f in data.columns]
         missing_features = [f for f in model_features if f not in data.columns]
-        
+
         if missing_features:
-            print(f"Warning: Missing features in data: {missing_features}")
-        
+            print(f"Error: Missing required features in data: {missing_features}")
+            return None
+
         if not available_features:
             print("Error: No model features found in data")
             return None
-        
-        print(f"Using {len(available_features)} features for predictions")
+
+        print(f"Using all {len(available_features)} required features for predictions")
         
         # Prepare features for prediction
         feature_data = data[available_features].dropna()
@@ -590,13 +623,18 @@ class PortfolioVisualizer:
         print("\n" + str(table) + "\n")        
         print("="*90)
         
+        # Calculate actual trade count from trades data
+        actual_trades_count = 0
+        if hasattr(self, 'model_trades_data') and not self.model_trades_data.empty:
+            actual_trades_count = len(self.model_trades_data)
+
         return {
             'benchmark': benchmark_metrics,
             'model_strategy': {
                 'final_value': model_final_value,
                 'total_return': model_total_return,
                 'annual_return': model_annual_return,
-                'trades': signal_changes,
+                'trades': actual_trades_count,
                 'time_selling': (signals == 0).mean()*100,
                 'time_holding': (signals == 1).mean()*100,
                 'time_buying': (signals == 2).mean()*100,
@@ -610,7 +648,7 @@ def main():
     """
     print("\n"*5+"🚀 Starting Portfolio Visualization Tool")
 
-    visualizer = PortfolioVisualizer(benchmark_stock="omxs30", transaction_fee=0.001)
+    visualizer = PortfolioVisualizer(benchmark_stock="omxs30", transaction_fee=0.0)
     
     visualizer.load_data()
     visualizer.calculate_benchmark_performance()

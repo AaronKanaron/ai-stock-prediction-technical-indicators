@@ -3,6 +3,7 @@ import numpy as np
 from xgboost import XGBClassifier
 from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
 from sklearn.metrics import precision_score, recall_score, f1_score
+from sklearn.feature_selection import SelectKBest, SelectPercentile, f_classif, mutual_info_classif, chi2
 import matplotlib.pyplot as plt
 import seaborn as sns
 import joblib
@@ -65,6 +66,7 @@ class WalkForwardValidator:
         self.test_months = test_months
         self.step_months = step_months
         self.results = None
+        self.feature_selector = None
 
     def load_datasets(self, dataset_names):
         """Load and combine multiple datasets."""
@@ -103,11 +105,12 @@ class WalkForwardValidator:
         valid_mask = ~(X.isna().any(axis=1) | y.isna())
         return X[valid_mask], y[valid_mask]
 
-    def compute_class_weights(self, y):
+    def compute_class_weights(self, y, method='balanced_moderate'):
         """Compute balanced class weights for handling class imbalance.
 
         Args:
             y: Target vector
+            method: Weighting method ('balanced', 'balanced_moderate', 'sqrt_balanced')
 
         Returns:
             dict: Class weights mapping
@@ -116,10 +119,101 @@ class WalkForwardValidator:
         total_samples = len(y)
         n_classes = len(class_counts)
 
-        return {
-            class_label: total_samples / (n_classes * class_counts[class_label])
-            for class_label in class_counts.index
+        if method == 'balanced':
+            # Standard sklearn balanced weighting
+            weights = {
+                class_label: total_samples / (n_classes * class_counts[class_label])
+                for class_label in class_counts.index
+            }
+        elif method == 'balanced_moderate':
+            # More moderate balancing to prevent over-correction
+            weights = {}
+            for class_label in class_counts.index:
+                raw_weight = total_samples / (n_classes * class_counts[class_label])
+                # Apply square root to moderate the effect
+                moderate_weight = np.sqrt(raw_weight)
+                weights[class_label] = moderate_weight
+        elif method == 'sqrt_balanced':
+            # Square root of inverse frequency
+            weights = {}
+            for class_label in class_counts.index:
+                freq = class_counts[class_label] / total_samples
+                weights[class_label] = 1.0 / np.sqrt(freq)
+        else:
+            # No weighting
+            weights = {class_label: 1.0 for class_label in class_counts.index}
+
+        # Print class distribution and weights for debugging
+        print(f"Class distribution: {dict(class_counts)}")
+        print(f"Class weights ({method}): {dict(weights)}")
+
+        return weights
+
+    def select_features(self, X_train, y_train, X_val=None, X_test=None,
+                       method='f_classif', k=20, percentile=50):
+        """Apply univariate feature selection to identify the best features.
+
+        Args:
+            X_train: Training feature matrix
+            y_train: Training target vector
+            X_val: Validation feature matrix (optional)
+            X_test: Test feature matrix (optional)
+            method: Selection method ('f_classif', 'mutual_info', 'chi2')
+            k: Number of best features to select (used with SelectKBest)
+            percentile: Percentile of features to keep (used with SelectPercentile)
+
+        Returns:
+            tuple: (X_train_selected, X_val_selected, X_test_selected, selected_features)
+        """
+        # Choose scoring function
+        if method == 'f_classif':
+            score_func = f_classif
+        elif method == 'mutual_info':
+            score_func = mutual_info_classif
+        elif method == 'chi2':
+            # For chi2, ensure all features are non-negative
+            if (X_train < 0).any().any():
+                print("Warning: Chi2 requires non-negative features. Converting negative values.")
+                X_train = X_train.copy()
+                X_train = X_train - X_train.min() + 1e-8
+                if X_val is not None:
+                    X_val = X_val - X_val.min() + 1e-8
+                if X_test is not None:
+                    X_test = X_test - X_test.min() + 1e-8
+            score_func = chi2
+        else:
+            raise ValueError(f"Unknown method: {method}")
+
+        # Determine whether to use k best or percentile selection
+        if k is not None and k > 0:
+            selector = SelectKBest(score_func=score_func, k=min(k, X_train.shape[1]))
+        else:
+            selector = SelectPercentile(score_func=score_func, percentile=percentile)
+
+        # Fit selector on training data
+        X_train_selected = selector.fit_transform(X_train, y_train)
+        selected_features = X_train.columns[selector.get_support()].tolist()
+
+        # Transform validation and test sets if provided
+        X_val_selected = None
+        X_test_selected = None
+        if X_val is not None:
+            X_val_selected = selector.transform(X_val)
+        if X_test is not None:
+            X_test_selected = selector.transform(X_test)
+
+        # Store feature selection scores for analysis
+        feature_scores = selector.scores_
+        self.feature_selection_results = {
+            'selected_features': selected_features,
+            'feature_scores': dict(zip(X_train.columns, feature_scores)),
+            'method': method,
+            'n_selected': len(selected_features)
         }
+
+        self.feature_selector = selector
+
+        return X_train_selected, X_val_selected, X_test_selected, selected_features
 
     def create_time_splits(self, df):
         """Create chronological walk-forward splits.
@@ -177,33 +271,41 @@ class WalkForwardValidator:
 
         return splits
 
-    def train_model(self, X_train, y_train, params=None):
-        """Train XGBoost classifier with class balancing."""
+    def train_model(self, X_train, y_train, params=None, class_weight_method='balanced_moderate'):
+        """Train XGBoost classifier with improved class balancing."""
         model_params = {
-            'n_estimators': 100,
+            'n_estimators': 150,
             'max_depth': 4,
-            'learning_rate': 0.1,
+            'learning_rate': 0.08,
             'subsample': 0.8,
             'colsample_bytree': 0.8,
-            'min_child_weight': 20,
-            'reg_alpha': 0.3,
-            'reg_lambda': 1.5,
+            'min_child_weight': 10,
+            'reg_alpha': 0.1,
+            'reg_lambda': 0.5,
             'random_state': 42,
             'n_jobs': -1,
             'eval_metric': 'mlogloss',
             'objective': 'multi:softprob',
-            'num_class': 3
+            'num_class': 3,
+            # Additional parameters for better class balance
+            'scale_pos_weight': None,  # Will be calculated
+            'max_delta_step': 1,       # Helps with class imbalance
         }
-        
+
         if params:
             model_params.update(params)
 
-        model = XGBClassifier(**model_params)
-
-        # Handle class imbalance with sample weights
-        class_weights = self.compute_class_weights(y_train)
+        # Handle class imbalance with improved sample weights
+        class_weights = self.compute_class_weights(y_train, method=class_weight_method)
         sample_weights = [class_weights.get(label, 1.0) for label in y_train]
-        
+
+        # Normalize sample weights to prevent extreme values
+        sample_weights = np.array(sample_weights)
+        sample_weights = sample_weights / np.mean(sample_weights)
+
+        print(f"Sample weight stats - Min: {sample_weights.min():.3f}, Max: {sample_weights.max():.3f}, Mean: {sample_weights.mean():.3f}")
+
+        model = XGBClassifier(**model_params)
         model.fit(X_train, y_train, sample_weight=sample_weights)
         return model
 
@@ -224,17 +326,29 @@ class WalkForwardValidator:
         
         return metrics
 
-    def run_validation(self, df, feature_columns=None, model_params=None):
-        """Execute walk-forward validation."""
+    def run_validation(self, df, feature_columns=None, model_params=None,
+                      feature_selection=None, class_weight_method='balanced_moderate'):
+        """Execute walk-forward validation with optional feature selection.
+
+        Args:
+            df: Input dataframe
+            feature_columns: Specific columns to use as features
+            model_params: XGBoost model parameters
+            feature_selection: Dict with feature selection parameters:
+                - 'method': 'f_classif', 'mutual_info', or 'chi2'
+                - 'k': number of features to select (or None)
+                - 'percentile': percentile of features to keep (if k is None)
+        """
         splits = self.create_time_splits(df)
-        
+
         if not splits:
             raise ValueError("No valid time splits created")
-        
+
         all_results = {
             'splits': [],
             'models': [],
             'feature_importance': [],
+            'feature_selection_results': [],
             'summary_metrics': {
                 'train_accuracy': [], 'val_accuracy': [], 'test_accuracy': [],
                 'train_f1': [], 'val_f1': [], 'test_f1': []
@@ -247,14 +361,31 @@ class WalkForwardValidator:
         for split_info in splits:
             split_id = split_info['split_id']
             data = split_info['data']
-            
+
             # Prepare features for current split
             X_train, y_train = self.prepare_features(data['train'], feature_columns)
             X_val, y_val = self.prepare_features(data['val'], feature_columns)
             X_test, y_test = self.prepare_features(data['test'], feature_columns)
-            
+
+            # Apply feature selection if specified
+            selected_features = None
+            if feature_selection:
+                method = feature_selection.get('method', 'f_classif')
+                k = feature_selection.get('k', 20)
+                percentile = feature_selection.get('percentile', 50)
+
+                X_train, X_val, X_test, selected_features = self.select_features(
+                    X_train, y_train, X_val, X_test, method, k, percentile
+                )
+
+                # Convert back to DataFrame for consistency
+                if isinstance(X_train, np.ndarray):
+                    X_train = pd.DataFrame(X_train, columns=selected_features)
+                    X_val = pd.DataFrame(X_val, columns=selected_features)
+                    X_test = pd.DataFrame(X_test, columns=selected_features)
+
             # Train and evaluate model
-            model = self.train_model(X_train, y_train, model_params)
+            model = self.train_model(X_train, y_train, model_params, class_weight_method)
             
             train_metrics = self.evaluate_model(model, X_train, y_train)
             val_metrics = self.evaluate_model(model, X_val, y_val)
@@ -270,12 +401,16 @@ class WalkForwardValidator:
                     'test': test_metrics
                 },
                 'model': model,
-                'feature_importance': model.feature_importances_
+                'feature_importance': model.feature_importances_,
+                'selected_features': selected_features
             }
-            
+
             all_results['splits'].append(split_result)
             all_results['models'].append(model)
             all_results['feature_importance'].append(model.feature_importances_)
+            all_results['feature_selection_results'].append(
+                self.feature_selection_results if feature_selection else None
+            )
             
             # Update summary metrics
             all_results['summary_metrics']['train_accuracy'].append(train_metrics['accuracy'])
@@ -290,7 +425,8 @@ class WalkForwardValidator:
         progress.finish()
         
         self.results = all_results
-        return all_results, X_train.columns.tolist()
+        final_features = selected_features if selected_features else X_train.columns.tolist()
+        return all_results, final_features
 
     def analyze_results(self, feature_names):
         """Analyze and visualize validation results."""
@@ -324,7 +460,19 @@ class WalkForwardValidator:
         print(f"\nTop 10 Features:")
         for i, (_, row) in enumerate(importance_df.head(10).iterrows()):
             print(f"  {i+1:2d}. {row['feature']}: {row['mean_importance']:.4f}")
-        
+
+        # Show feature selection statistics if used
+        if hasattr(self, 'feature_selection_results') and self.feature_selection_results:
+            fs_results = self.feature_selection_results
+            print(f"\nFeature Selection Summary:")
+            print(f"  Method: {fs_results['method']}")
+            print(f"  Selected: {fs_results['n_selected']} features")
+            print(f"  Top 5 Feature Selection Scores:")
+            sorted_scores = sorted(fs_results['feature_scores'].items(),
+                                 key=lambda x: x[1], reverse=True)
+            for i, (feature, score) in enumerate(sorted_scores[:5]):
+                print(f"    {i+1:2d}. {feature}: {score:.4f}")
+
         return importance_df
 
     def _create_plots(self, feature_names):
@@ -423,14 +571,36 @@ class WalkForwardValidator:
 
 def main(
     dataset_names: Optional[Union[Stocks, List[Stocks]]] = None,
-    feature_columns=None, model_params=None
+    feature_columns=None, model_params=None, feature_selection=None,
+    class_weight_method='balanced_moderate'
 ):
-    """Run walk-forward validation on specified datasets."""
+    """Run walk-forward validation on specified datasets with optional feature selection.
+
+    Args:
+        dataset_names: List of dataset names to use
+        feature_columns: Specific columns to use as features
+        model_params: XGBoost model parameters
+        feature_selection: Dict with feature selection parameters:
+            - 'method': 'f_classif', 'mutual_info', or 'chi2'
+            - 'k': number of features to select (or None)
+            - 'percentile': percentile of features to keep (if k is None)
+    """
     if dataset_names is None:
         dataset_names = ['OMXS30']
-    
-    print("Walk-Forward Validation for Stock Prediction")
-    print("=" * 50)
+
+    print("Walk-Forward Validation for Stock Prediction with Feature Selection")
+    print("=" * 65)
+
+    if feature_selection:
+        method = feature_selection.get('method', 'f_classif')
+        k = feature_selection.get('k')
+        percentile = feature_selection.get('percentile', 50)
+        print(f"Feature Selection: {method}")
+        if k:
+            print(f"Selecting top {k} features")
+        else:
+            print(f"Selecting top {percentile}% features")
+        print("=" * 65)
 
     validator = WalkForwardValidator()
     print(f"Using datasets: {', '.join(dataset_names)}")
@@ -441,7 +611,7 @@ def main(
     print(f"Date range: {df['Date'].min()} to {df['Date'].max()}")
 
     # Run validation pipeline
-    results, feature_names = validator.run_validation(df, feature_columns, model_params)
+    results, feature_names = validator.run_validation(df, feature_columns, model_params, feature_selection, class_weight_method)
     importance_df = validator.analyze_results(feature_names)
     model_filename, best_model = validator.save_best_model(dataset_names)
     
@@ -462,35 +632,24 @@ def main(
 
 
 if __name__ == "__main__":
-    results = main([
-        'abb',
-        'addtech',
-        'alfa',
-        'assa',
-        'astrazeneca',
-        'atlascopco',
-        'boliden',
-        'epiroc',
-        'eqt',
-        'ericsson',
-        'essity',
-        'evolution',
-        'handelsbanken',
-        'hexagon',
-        'hmb',
-        'industrivarden',
-        'investor',
-        'lifco',
-        'nibe',
-        'nordea',
-        'saab',
-        'sandvik',
-        'sca',
-        'seb',
-        'skanska',
-        'skf',
-        'swedbank',
-        'tele2',
-        'telia',
-        'volvo',
-    ])
+    # Example 1: Basic usage without feature selection
+    # results = main(['OMXS30'])
+
+    # Example 2: Using feature selection with F-test (ANOVA)
+    feature_selection_config = {
+        'method': 'f_classif',  # "f_classif", 'mutual_info', 'chi2'
+        # 'k': 10,               # select top 15 features
+        'percentile': 50     # alternatively, select top 50% features
+    }
+
+    results = main(
+        dataset_names=[
+            'abb', 'addtech', 'alfa', 'assa', 'astrazeneca', 'atlascopco',
+            'boliden', 'epiroc', 'eqt', 'ericsson', 'essity', 'evolution',
+            'handelsbanken', 'hexagon', 'hmb', 'industrivarden', 'investor',
+            'lifco', 'nibe', 'nordea', 'saab', 'sandvik', 'sca', 'seb',
+            'skanska', 'skf', 'swedbank', 'tele2', 'telia', 'volvo'
+        ],
+        feature_selection=feature_selection_config,
+        class_weight_method='balanced_moderate'
+    )
