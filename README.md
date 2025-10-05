@@ -2,6 +2,12 @@
 
 Predicting Swedish stock prices using XGBoost and technical analysis. This project trains a model on OMXS30 stocks to classify whether to buy, hold, or sell based on price patterns and indicators.
 
+<div style="display: flex; justify-content: center; align-items: center; gap: 10px;">
+  <img src="/visualizer/images/walk_forward_analysis.png" alt="Model" width="49%">
+  <img src="/visualizer/images/portfolio_comparison.png" alt="Performance" width="49%">
+</div>
+
+
 ## How It Works
 
 The system downloads historical stock data, calculates technical indicators (RSI, MACD, Bollinger Bands, etc.), and trains an XGBoost model using walk-forward validation. The model learns to predict 5-day forward returns based on current market conditions.
