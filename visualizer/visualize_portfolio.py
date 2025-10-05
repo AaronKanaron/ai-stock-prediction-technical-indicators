@@ -6,42 +6,9 @@ from datetime import datetime
 import os
 import joblib
 from sklearn.preprocessing import StandardScaler
-from prettytable import PrettyTable
 
-Stocks = Literal[
-    "abb",
-    "addtech",
-    "alfa",
-    "assa",
-    "astrazeneca",
-    'atlascopco',
-    "boliden",
-    "epiroc",
-    "eqt",
-    "ericsson",
-    "essity",
-    "evolution",
-    "handelsbanken",
-    "hexagon",
-    "hmb",
-    "industrivarden",
-    "investor",
-    "lifco",
-    "nibe",
-    "nordea",
-    "saab",
-    "sandvik",
-    "sca",
-    "seb",
-    "skanska",
-    "skf",
-    "swedbank",
-    "tele2",
-    "telia",
-    "volvo",
-    
-    "OMXS30",
-]
+from prettytable import PrettyTable
+from xgboost_walk_forward import Stocks
 
 
 class PortfolioVisualizer:

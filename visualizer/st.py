@@ -7,7 +7,8 @@ import glob
 from datetime import datetime
 from typing import get_args
 sys.path.append('..')
-from visualize_portfolio import PortfolioVisualizer, Stocks
+from visualize_portfolio import PortfolioVisualizer
+from xgboost_walk_forward import Stocks
 
 st.set_page_config(
     page_title="Portfolio Visualizer",
@@ -285,7 +286,7 @@ def main():
                     st.metric(
                         "🤖 AI Model Total Return",
                         f"{model_metrics['total_return']:.2f}%",
-                        delta=f"{model_metrics['total_return'] - benchmark_metrics['total_return']:.2f}%"
+                        delta=f"{(model_metrics['total_return'] / benchmark_metrics['total_return'] - 1) * 100:.2f}%"
                     )
 
                 with col3:
@@ -360,19 +361,19 @@ def main():
                 st.write(f"• Total Fees Paid: {visualizer.model_total_fees:.2f}")
 
         # Model information
-        if has_model and selected_model_path:
-            st.subheader("🤖 Model Information")
-            model_filename = os.path.basename(selected_model_path)
-            model_size = os.path.getsize(selected_model_path) / (1024 * 1024)  # Size in MB
-            model_modified = datetime.fromtimestamp(os.path.getmtime(selected_model_path))
+        # if has_model and selected_model_path:
+        #     st.subheader("🤖 Model Information")
+        #     model_filename = os.path.basename(selected_model_path)
+        #     model_size = os.path.getsize(selected_model_path) / (1024 * 1024)  # Size in MB
+        #     model_modified = datetime.fromtimestamp(os.path.getmtime(selected_model_path))
 
-            col1, col2, col3 = st.columns(3)
-            with col1:
-                st.metric("📄 Model File", model_filename[:20] + "..." if len(model_filename) > 20 else model_filename)
-            with col2:
-                st.metric("💾 File Size", f"{model_size:.1f} MB")
-            with col3:
-                st.metric("📅 Last Modified", model_modified.strftime("%Y-%m-%d %H:%M"))
+        #     col1, col2, col3 = st.columns(3)
+        #     with col1:
+        #         st.metric("📄 Model File", model_filename[:20] + "..." if len(model_filename) > 20 else model_filename)
+        #     with col2:
+        #         st.metric("💾 File Size", f"{model_size:.1f} MB")
+        #     with col3:
+        #         st.metric("📅 Last Modified", model_modified.strftime("%Y-%m-%d %H:%M"))
 
         # Download section
         st.subheader("💾 Export Data")

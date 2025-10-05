@@ -49,7 +49,6 @@ class TechnicalIndicators:
         # Undvik division med noll
         daily_range = daily_range.where(daily_range > 0, np.nan)
         
-        # Position av close inom dagens range (0 = Low, 1 = High)
         trend_strength = (data['Close'] - data['Low']) / daily_range
         
         # Konvertera till -1 till +1 skala (-1 = nära Low, +1 = nära High)
@@ -70,10 +69,8 @@ def calculate_technical_indicators(df):
     Returns:
     DataFrame: Original data with added technical indicators
     """
-    # Make a copy to avoid modifying original data
     data = df.copy()
     
-    # Ensure Date is datetime and set as index for calculations
     data['Date'] = pd.to_datetime(data['Date'])
     data = data.sort_values('Date').reset_index(drop=True)
     
@@ -308,6 +305,7 @@ def main():
         ("tele2_rawdata.csv", "tele2.csv"),
         ("telia_rawdata.csv", "telia.csv"),
         ("volvo_rawdata.csv", "volvo.csv"),
+        ("ASTS_rawdata.csv", "ASTS.csv")
     ]
     
     # Ensure data directory exists
